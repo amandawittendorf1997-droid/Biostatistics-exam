@@ -1,0 +1,355 @@
+---
+title: "Del A"
+author: "AW"
+date: "`r Sys.Date()`"
+output: html_document
+---
+# DATA PREPROCESSING
+## LIBRARIES 
+```{r}
+library(statistik)
+library(lme4)
+library(lmerTest)
+library(survival)
+library(pwrss)
+library(presize)
+library(patchwork)
+library(parameters)
+library(dplyr)
+library(ggdag)
+library(ggplot2)
+```
+
+
+## DATASET
+```{r}
+del1 <- read_csv("eksamen-statistik-1.csv")
+```
+*Association:* the use of oxytocin (pg/ml) and the mothers BMI (kg/m2)
+*Periode:* cohortstudy (2000 - 2001)
+
+
+### OVERVIEW
+To get a overview of all the collums 
+```{r}
+summary(del1)
+```
+Following need to be changed: 
+- *character* change to a factor with a specific reference
+- *Year:* filter the periode to 2000 - 2001 
+
+To set the correct reference for each factor, I'm checking which characters each colloums have 
+```{r}
+lapply(del1[sapply(del1, is.character) | sapply(del1, is.factor)], unique)
+```
+
+Changing all of the above
+```{r}
+dat_del1 <- del1 |> 
+  filter(year == "2000-2001") |> 
+  mutate(
+    exposure = factor(exposure),
+    exposure = fct_relevel(exposure, "Unexposed"),
+         
+    sex = factor(sex),
+    sex = fct_relevel(sex, "Male"),
+         
+    mat_smoked = factor(mat_smoked),
+    mat_smoked = fct_relevel(mat_smoked, "Non-smoker"),
+         
+    mat_psych = factor(mat_psych),
+    mat_psych = fct_relevel(mat_psych, "Previously diagnosed"),
+         
+    mat_antidrep = factor(mat_antidrep),
+    mat_antidrep = fct_relevel(mat_antidrep, "Previous redemption"),
+         
+    mat_cohab = factor(mat_cohab),
+    mat_cohab = fct_relevel(mat_cohab, "Not living with partner"),
+         
+    mat_educ = factor(mat_educ),
+    mat_educ = fct_relevel(mat_educ, "Higher education")
+    )
+```
+
+Checking if all the changes is correct: 
+```{r}
+summary(dat_del1)
+```
+
+
+================================================================================
+# ASSIGNMENT 1.A
+================================================================================
+Describe the distribution of BMI within the two exposure groups, and estimate the mean and standard deviation of the distribution for both groups.
+
+## DISTRUBUTION 
+Firstly, I'm gonna draw a histogram and Q-Q plot of the maternal BMI
+
+*Histogram*
+```{r}
+# Histogram
+p1 <- dat_del1 |>
+  drop_na(mat_BMI) |>             # Drop the NAs
+  ggplot(aes(x = mat_BMI)) +       
+  geom_histogram() +              
+  facet_wrap(~ exposure) +         
+  labs(x = "Mothers BMI", 
+       y = "Frequency", 
+       title = "Figure A: Histogram of maternal BMI") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Q-Q plot
+p2 <- dat_del1 |>
+  drop_na(mat_BMI) |>             # Drop the NAs
+  ggplot(aes(sample = mat_BMI)) +
+  stat_qq() + 
+  stat_qq_line() +
+  facet_wrap(~ exposure) +
+  labs(x = "Theoretical quantiles", 
+       y = "Sample quantiles", 
+       title = "Figure B: Q-Q plot of maternal BMI") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Collection the two subplots to one 
+figure1 <- (p1 / p2) + 
+  plot_annotation(title = "Figure 1: Distribution of maternal BMI across exposure groups")
+figure1
+```
+
+### ANSWER 
+The normal distribution of maternal BMI was assessed for the two exposure groups, categorized by whether or not they were exposed to synthetic oxytocin during labor. Normal distribution is an underlying assumption when comparing continuous data, such as BMI. It is noted that missing values were present for BMI, and these were removed from the analysis. Normality is evaluated using a quantile-quantile plot (Q-Q plot) and/or a histogram which is shown in **Figure 1**. 
+
+The histograms show a right-skewed but bell-shaped normal distribution of both groups; this can be considered to be expected because of the biologically componed. 
+
+For the Q-Q plot, it is observed that the points closely follow the straight reference line where the majority of the observations lie. Deviations are, however, present at the extreme lower and upper tails of the BMI measurements. When evaluated against the principle of a 'perfect' normal distribution, it can be assumed that the observed Q-Q plot indicates a non-normal distribution.
+
+All in all, the distribution is considered reasonably normal distributed. Also the sample size is sufficiently large (n = 46,051) to justify the estimation of the mean, SD and PI. 
+
+
+## MEAN, SD & 95%-CI 
+Later I need to calculate the limits of agreement; therefore, I'm gonna save the calculations in a table
+```{r}
+# Save in a table 
+table_1A <- dat_del1 |> 
+  drop_na(mat_BMI) |> 
+  summarise(n = n(),
+            min_mean = min(mat_BMI),
+            max_mean = max(mat_BMI),
+            mean = mean(mat_BMI),
+            sd = sd(mat_BMI),
+            .by = exposure)
+```
+
+## SD OF THE DISRIBUTION FOR BOTH GROUPS 
+To answer this, we need to calculate the limits of agreement (PI)
+```{r}
+table_1A <- table_1A |> 
+  mutate(CI_lower = mean - 1.96 * (sd / sqrt(n)),
+         CI_upper = mean + 1.96 * (sd /sqrt(n)),
+         PI_lower = mean - 1.96 * sd,
+         PI_upper = mean + 1.96 * sd)
+
+# View
+table_1A
+```
+
+
+================================================================================
+# ASSIGNMENT 1.B
+================================================================================
+Estimate the difference in mean BMI between the two exposure groups 
+
+To calculate the difference the t-test is used 
+```{r}
+# Complete table 
+collect_t_test <- bind_rows(
+  "Unexposed Group" = t.test(mat_BMI ~ 1, data = filter(dat_del1, exposure == "Unexposed")) |> parameters() |> as.data.frame(),
+  "Exposed Group"   = t.test(mat_BMI ~ 1, data = filter(dat_del1, exposure == "Exposed")) |> parameters() |> as.data.frame(),
+  "Comparison"      = t.test(mat_BMI ~ exposure, data = dat_del1) |> parameters() |> as.data.frame(),
+  .id = "Test_Type"
+  ) |> 
+  select(Test_Type, Difference, CI_low, CI_high, p
+         ) |> 
+  mutate(
+    Difference = case_when(TRUE ~ as.character(round(Difference, 3))),
+    CI_low = case_when(TRUE ~ as.character(round(CI_low, 3))),
+    CI_high = case_when(TRUE ~ as.character(round(CI_high, 3))),
+    p = case_when(p < 0.001 ~ "< 0.001",
+                  p < 0.05  ~ "< 0.05",
+                  TRUE      ~ as.character(round(p, 3)))
+    )
+
+# Print the results
+collect_t_test
+```
+
+## ANSWER 
+The comparison was performed using a t-test, where the mean BMI within each exposure group was compared using a mean difference. The difference in mean BMI between the unexposed and exposed groups was estimated to be -1.15 (95% CI: -1.22; -1.09). This difference is statistically significant (p < 0.001).
+
+
+
+================================================================================
+# ASSIGNMENT 2.A
+================================================================================
+The comparison between the exposure groups was adjusted for maternal smoking status, age, and educational level, utilizing the same time period as the previous task (2000–2001). Smoking was coded into three categories. For this purpose, the regression model was constructed without interaction terms.
+
+A **multiple linear regression model** (additive) was constructed because the outcome variable, BMI, is continuous, and the model adjusts for the parameters specified in the assignment description. 
+
+The colloum "smoker" has two catagories called: 
+- "Occasional smoker" 
+- "Daily smoker"
+These need to be collected to one category called "Smoker" so the collum only has three categories:
+```{r}
+dat_del1 <- dat_del1 |> mutate(
+  mat_smoked_grp = fct_collapse(mat_smoked,
+                                "Smoker" = c("Occasional smoker", "Daily smoker")))
+```
+
+Now the **multiple linear regression model** can be made: 
+```{r}
+lin_model <- lm(mat_BMI ~ exposure + mat_age + mat_smoked_grp + mat_educ, 
+                na.action = "na.exclude",                               # Exclude all NAs
+                data = dat_del1)
+
+# Print the results 
+parameters(lin_model, digits = 3, 
+           include_reference = TRUE)
+nobs(lin_model)
+sigma(lin_model)
+```
+
+## ANSWER 
+**Intercept**
+The average BMI for an unexposed mother who is a non-smoker, 0 years of age, and has a high educational level is estimated to be 18.85 (95% CI: 18.54; 19.15). This estimate does not represent a clinically meaningful or realistic value.
+
+**Exposed**
+The difference in average BMI between two mothers—where one is exposed and the other is unexposed, but who share the same smoking status, age, and educational level—is estimated to be 1.28 (95% CI: 1.22; 1.34) and is statistically significant.
+
+**Maternal Age**
+The difference in average BMI between two mothers—where one is one year older than the other, but who share the same exposure status, smoking status, and educational level—is estimated to be 0.12 (95% CI: 0.11; 0.13) and is statistically significant.
+
+**Smoker**
+The difference in average BMI between two mothers—where one is a smoker and the other is a non-smoker, but who share the same exposure status, age, and educational level—is estimated to be -0.96 (95% CI: -1.03; -0.89) and is statistically significant. 
+
+**Smoker**
+Interpreted analogously to the smoking category above.
+
+**Low Educational Level**
+The difference in average BMI between two mothers—where one has a low educational level and the other has a high educational level, but who share the same exposure status, age, and smoking status—is estimated to be 1.74 (95% CI: 1.67; 1.80) and is statistically significant.
+
+**Confidence Intervals (95% CI)**
+The confidence intervals are interpreted as indicating that the true parameter value is highly unlikely to be lower than the lower bound or higher than the upper bound. This interpretation of the 95% CI will be applied throughout the remainder of the assignment.
+
+
+================================================================================
+# ASSIGNMENT 2.B
+================================================================================
+Account for the assumptions underlying the analysis in the previous assignment, and evaluate the validity of these assumptions.
+
+To account for this, a *model diagnostics* is performed to evaluate the validity of the analytical results. This was conducted to assess whether the underlying assumptions for multiple linear regression are considered fulfilled.The assumptions for multiple linear regression are:
+1. **Linearity:** The mean of the outcome variable is a linear function of each explanatory variable when the other variables are held constant; i.e., the model is correctly specified.
+2. **Independence:** The residuals (deviations) are independent across individuals.
+3. **Homoscedasticity (Equal Variance):** The residuals have the same distribution for all individuals, including a constant mean of zero and a constant variance (standard deviation).
+4. **Normality:** The residuals follow a normal distribution.
+
+These are evaluated through plots:
+```{r}
+# Calculate fitted values and residuals
+dat_del1 <- dat_del1 |>
+  mutate(.fitted = fitted(lin_model),
+         .resid = resid(lin_model)) |> 
+  drop_na(.resid)
+
+# Plot A: Residuals vs. Fitted values (Continuous x continuous - small jitter)
+p1 <- ggplot(data = dat_del1, 
+             aes(x = .fitted, y = .resid)) +
+  geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
+  geom_hline(yintercept = 0) +
+  labs(x = "Fitted value", 
+       y = "Residual", 
+       title = "Figure A") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Plot B: Residuals vs. Exposure group (Categorical x)
+p2 <- ggplot(data = dat_del1, 
+             aes(x = exposure, y = .resid)) +
+  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_hline(yintercept = 0) +
+  labs(x = "Exposure group", 
+       y = "Residual", 
+       title = "Figure B") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Plot C: Residuals vs. Maternal age (Continuous x - small width jitter)
+p3 <- ggplot(data = dat_del1, 
+             aes(x = mat_age, y = .resid)) +
+  geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
+  geom_hline(yintercept = 0) +
+  labs(x = "Maternal age (years)", 
+       y = "Residual", 
+       title = "Figure C") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Plot D: Residuals vs. Smoking status (Categorical x)
+p4 <- ggplot(data = dat_del1, 
+             aes(x = mat_smoked_grp, y = .resid)) +
+  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_hline(yintercept = 0) +
+  labs(x = "Maternal smoking status", 
+       y = "Residual", 
+       title = "Figure D") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Plot E: Residuals vs. Educational level (Categorical x)
+p5 <- ggplot(data = dat_del1, 
+             aes(x = mat_educ, y = .resid)) +
+  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_hline(yintercept = 0) +
+  labs(x = "Maternal educational level", 
+       y = "Residual", 
+       title = "Figure E") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Plot F: Q-Q plot of the residuals
+p6 <- ggplot(data = dat_del1, 
+             aes(sample = .resid)) +
+  stat_qq(alpha = 0.4, size = 0.8) +
+  stat_qq_line() +
+  labs(x = "Theoretical quantiles", 
+       y = "Sample quantiles", 
+       title = "Figure F") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11))
+
+# Combine all six plots into a grid
+figure2 <- ((p1 + p2) / (p3 + p4) / (p5 + p6)) + 
+  plot_annotation(title = "Figure 2: Model diagnostics")
+figure2
+```
+
+
+## ANSWER 
+**Assumptions (1, 3)**
+These assumptions were assessed using the first five plots (Figures A–E), which indicate that the level and variance of the residuals do not depend substantially on the explanatory variables. Also, the variation between the points is smaller, resulting in a more compact distribution. This strengthens the argument that the mean of the outcome variable is a linear function of each explanatory variable.
+For Figures A and C, the points form a "broad band" evenly distributed above and below the zero line, with data scattered uniformly along the x-axis, suggesting equal variance. For Figures B, D, and E, the level of the residuals also appears reasonably evenly distributed above and below the zero line. Furthermore, homoscedasticity (equal variance) is considered a reasonable assumption.
+
+**Assumption (2)**
+This assumption is considered fulfilled based on the study design and data collection process. Since each woman could only contribute her first birth during the specified period, the same mother appears only once within the dataset, ensuring independence between observations.
+
+**Assumption (4)**
+This assumption was evaluated using the final plot (Figure F), where the points should ideally follow a straight reference line. Consequently, the residuals—in this specific case—cannot be adequately described by a normal distribution. Also, the quantiles lie closer to the identity line, thereby confirming the assumption of a normal distribution
+
+
+
+
+
+
+
+
