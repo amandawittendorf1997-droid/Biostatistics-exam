@@ -450,7 +450,9 @@ plot_predictions(lin_model_int,
        title = "Figure 3: Test for no interaction",
        color = "Smoking status", 
        fill = "Smoking status") +
-  theme_minimal()
+  theme_minimal() + 
+    scale_color_manual(values = c("#3a86d4", "#d96b52", "#5a9e72")) +
+  scale_fill_manual(values = c("#3a86d4", "#d96b52", "#5a9e72"))
 ```
 
 ### ANSWER
