@@ -28,9 +28,7 @@ del1 <- read_csv("eksamen-statistik-1.csv")
 *Association:* the use of oxytocin (pg/ml) and the mothers BMI (kg/m2)
 *Periode:* cohortstudy (2000 - 2001)
 
-
-### OVERVIEW
-To get a overview of all the collums 
+To get a *overview* of all the collums in the dataset
 ```{r}
 summary(del1)
 ```
@@ -38,12 +36,12 @@ Following need to be changed:
 - *character* change to a factor with a specific reference
 - *Year:* filter the periode to 2000 - 2001 
 
-To set the correct reference for each factor, I'm checking which characters each colloums have 
+To set the correct reference for each factor, I'm checking which categories each character have
 ```{r}
 lapply(del1[sapply(del1, is.character) | sapply(del1, is.factor)], unique)
 ```
 
-Changing all of the above
+Changing all of the above with, what I find to be, the correct reference.  
 ```{r}
 dat_del1 <- del1 |> 
   filter(year == "2000-2001") |> 
@@ -84,14 +82,12 @@ Describe the distribution of BMI within the two exposure groups, and estimate th
 
 ## DISTRUBUTION 
 Firstly, I'm gonna draw a histogram and Q-Q plot of the maternal BMI
-
-*Histogram*
 ```{r}
 # Histogram
 p1 <- dat_del1 |>
   drop_na(mat_BMI) |>             # Drop the NAs
   ggplot(aes(x = mat_BMI)) +       
-  geom_histogram() +              
+  geom_histogram(binwidth=1, fill="#3a86d4", color="#e9ecef", alpha=0.7) + 
   facet_wrap(~ exposure) +         
   labs(x = "Mothers BMI", 
        y = "Frequency", 
@@ -103,8 +99,8 @@ p1 <- dat_del1 |>
 p2 <- dat_del1 |>
   drop_na(mat_BMI) |>             # Drop the NAs
   ggplot(aes(sample = mat_BMI)) +
-  stat_qq() + 
-  stat_qq_line() +
+  stat_qq(colour = "#3a86d4", alpha = 0.7, size = 1.0) + 
+  stat_qq_line(size = 0.5) +
   facet_wrap(~ exposure) +
   labs(x = "Theoretical quantiles", 
        y = "Sample quantiles", 
@@ -121,9 +117,9 @@ figure1
 ### ANSWER 
 The normal distribution of maternal BMI was assessed for the two exposure groups, categorized by whether or not they were exposed to synthetic oxytocin during labor. Normal distribution is an underlying assumption when comparing continuous data, such as BMI. It is noted that missing values were present for BMI, and these were removed from the analysis. Normality is evaluated using a quantile-quantile plot (Q-Q plot) and/or a histogram which is shown in **Figure 1**. 
 
-The histograms show a right-skewed but bell-shaped normal distribution of both groups; this can be considered to be expected because of the biologically componed. 
+*The histograms* is right-skewed, bell-shaped normal distributed for both groups. This can be considered to be expected because of the biologically componed. 
 
-For the Q-Q plot, it is observed that the points closely follow the straight reference line where the majority of the observations lie. Deviations are, however, present at the extreme lower and upper tails of the BMI measurements. When evaluated against the principle of a 'perfect' normal distribution, it can be assumed that the observed Q-Q plot indicates a non-normal distribution.
+For *the Q-Q plot*, it is observed that the points closely follow the straight reference line where the majority of the observations lie. Deviations are, however, present at the extreme lower and upper tails of the BMI measurements. When evaluated against the principle of a 'perfect' normal distribution, it can be assumed that the observed Q-Q plot indicates a non-normal distribution. In addition, it correlates to the right-skewed distribution observed in *the histograms*.
 
 All in all, the distribution is considered reasonably normal distributed. Also the sample size is sufficiently large (n = 46,051) to justify the estimation of the mean, SD and PI. 
 
@@ -193,31 +189,37 @@ The comparison was performed using a t-test, where the mean BMI within each expo
 ================================================================================
 # ASSIGNMENT 2.A
 ================================================================================
-The comparison between the exposure groups was adjusted for maternal smoking status, age, and educational level, utilizing the same time period as the previous task (2000–2001). Smoking was coded into three categories. For this purpose, the regression model was constructed without interaction terms.
+Make a comparison between the exposure groups with adjustment for maternal smoking status, age, and educational level, utilizing the same time period as the previous task (2000–2001). 
 
-A **multiple linear regression model** (additive) was constructed because the outcome variable, BMI, is continuous, and the model adjusts for the parameters specified in the assignment description. 
-
-The colloum "smoker" has two catagories called: 
-- "Occasional smoker" 
-- "Daily smoker"
-These need to be collected to one category called "Smoker" so the collum only has three categories:
+**Maternal smoking status**
+This variable has two catagories which need to be collected to one catagory. These are called: 
+  1. "Occasional smoker" 
+  2. "Daily smoker"
 ```{r}
 dat_del1 <- dat_del1 |> mutate(
   mat_smoked_grp = fct_collapse(mat_smoked,
                                 "Smoker" = c("Occasional smoker", "Daily smoker")))
+
+# Setting the reference 
+dat_del1 <- dat_del1 |> 
+  mutate(mat_smoked_grp = factor(mat_smoked_grp),
+         mat_smoked_grp = fct_relevel(mat_smoked_grp, "Non-smoker"))
 ```
 
-Now the **multiple linear regression model** can be made: 
+
+**Multiple linear regression model**
+For the purpose of the assigment, the regression model is constructed without interaction terms. 
+A additive regression model is constructed because the outcome variable, BMI, is continuous, and the model adjusts for the parameters specified in the assignment description. 
 ```{r}
 lin_model <- lm(mat_BMI ~ exposure + mat_age + mat_smoked_grp + mat_educ, 
                 na.action = "na.exclude",                               # Exclude all NAs
                 data = dat_del1)
 
-# Print the results 
+# Print the results
 parameters(lin_model, digits = 3, 
            include_reference = TRUE)
-nobs(lin_model)
-sigma(lin_model)
+nobs(lin_model)                       # Total number of observations
+sigma(lin_model)                      # Sigma
 ```
 
 ## ANSWER 
@@ -233,7 +235,7 @@ The difference in average BMI between two mothers—where one is one year older 
 **Smoker**
 The difference in average BMI between two mothers—where one is a smoker and the other is a non-smoker, but who share the same exposure status, age, and educational level—is estimated to be -0.96 (95% CI: -1.03; -0.89) and is statistically significant. 
 
-**Smoker**
+**Ex-smoker**
 Interpreted analogously to the smoking category above.
 
 **Low Educational Level**
@@ -248,13 +250,15 @@ The confidence intervals are interpreted as indicating that the true parameter v
 ================================================================================
 Account for the assumptions underlying the analysis in the previous assignment, and evaluate the validity of these assumptions.
 
-To account for this, a *model diagnostics* is performed to evaluate the validity of the analytical results. This was conducted to assess whether the underlying assumptions for multiple linear regression are considered fulfilled.The assumptions for multiple linear regression are:
-1. **Linearity:** The mean of the outcome variable is a linear function of each explanatory variable when the other variables are held constant; i.e., the model is correctly specified.
-2. **Independence:** The residuals (deviations) are independent across individuals.
-3. **Homoscedasticity (Equal Variance):** The residuals have the same distribution for all individuals, including a constant mean of zero and a constant variance (standard deviation).
-4. **Normality:** The residuals follow a normal distribution.
+**Model diagnostics**
+This is performed to evaluate the validity of the analytical results to assess whether the underlying assumptions for multiple linear regression are considered fulfilled. This is evaluated through plots.
 
-These are evaluated through plots:
+The assumptions for multiple linear regression are:
+  1. *Linearity:* The mean of the outcome variable is a linear function of each explanatory variable when the other variables are held constant; i.e., the model is correctly specified.
+  2. *Independence:* The residuals (deviations) are independent across individuals.
+  3. *Homoscedasticity (Equal Variance):* The residuals have the same distribution for all individuals, including a constant mean of zero and a constant variance (standard deviation).
+  4. *Normality:* The residuals follow a normal distribution.
+
 ```{r}
 # Calculate fitted values and residuals
 dat_del1 <- dat_del1 |>
@@ -265,7 +269,7 @@ dat_del1 <- dat_del1 |>
 # Plot A: Residuals vs. Fitted values (Continuous x continuous - small jitter)
 p1 <- ggplot(data = dat_del1, 
              aes(x = .fitted, y = .resid)) +
-  geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
+  geom_jitter(colour = "#3a86d4", alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
   geom_hline(yintercept = 0) +
   labs(x = "Fitted value", 
        y = "Residual", 
@@ -276,7 +280,7 @@ p1 <- ggplot(data = dat_del1,
 # Plot B: Residuals vs. Exposure group (Categorical x)
 p2 <- ggplot(data = dat_del1, 
              aes(x = exposure, y = .resid)) +
-  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_jitter(colour = "#3a86d4", alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
   geom_hline(yintercept = 0) +
   labs(x = "Exposure group", 
        y = "Residual", 
@@ -287,7 +291,7 @@ p2 <- ggplot(data = dat_del1,
 # Plot C: Residuals vs. Maternal age (Continuous x - small width jitter)
 p3 <- ggplot(data = dat_del1, 
              aes(x = mat_age, y = .resid)) +
-  geom_jitter(alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
+  geom_jitter(colour = "#3a86d4", alpha = 0.2, size = 0.8, width = 0.1, height = 0) +
   geom_hline(yintercept = 0) +
   labs(x = "Maternal age (years)", 
        y = "Residual", 
@@ -298,7 +302,7 @@ p3 <- ggplot(data = dat_del1,
 # Plot D: Residuals vs. Smoking status (Categorical x)
 p4 <- ggplot(data = dat_del1, 
              aes(x = mat_smoked_grp, y = .resid)) +
-  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_jitter(colour = "#3a86d4", alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
   geom_hline(yintercept = 0) +
   labs(x = "Maternal smoking status", 
        y = "Residual", 
@@ -309,7 +313,7 @@ p4 <- ggplot(data = dat_del1,
 # Plot E: Residuals vs. Educational level (Categorical x)
 p5 <- ggplot(data = dat_del1, 
              aes(x = mat_educ, y = .resid)) +
-  geom_jitter(alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
+  geom_jitter(colour = "#3a86d4", alpha = 0.2, size = 0.8, width = 0.2, height = 0) +
   geom_hline(yintercept = 0) +
   labs(x = "Maternal educational level", 
        y = "Residual", 
@@ -320,7 +324,7 @@ p5 <- ggplot(data = dat_del1,
 # Plot F: Q-Q plot of the residuals
 p6 <- ggplot(data = dat_del1, 
              aes(sample = .resid)) +
-  stat_qq(alpha = 0.4, size = 0.8) +
+  stat_qq(colour = "#3a86d4", alpha = 0.4, size = 0.8) +
   stat_qq_line() +
   labs(x = "Theoretical quantiles", 
        y = "Sample quantiles", 
@@ -345,6 +349,177 @@ This assumption is considered fulfilled based on the study design and data colle
 
 **Assumption (4)**
 This assumption was evaluated using the final plot (Figure F), where the points should ideally follow a straight reference line. Consequently, the residuals—in this specific case—cannot be adequately described by a normal distribution. Also, the quantiles lie closer to the identity line, thereby confirming the assumption of a normal distribution
+
+
+================================================================================
+# ASSIGNMENT 2.C
+================================================================================
+Modify the analysis from Assignemt 2.A to examine whether *smoking* modifies the effect of *maternal age on mean BMI*. The response must include an estimate of the effect of age for each of the three smoking groups, as well as a figure visualizing these
+
+## REGRESSION MODEL: INTERAKTION
+To answer the question, the multiple linear regression model is modified with a interaction between *mat_age* and *mat_smoked*:
+```{r}
+lin_model_int <- lm(mat_BMI ~ exposure + mat_age * mat_smoked_grp + mat_educ, 
+                    na.action = "na.exclude", 
+                    data = dat_del1)
+
+# Print the results with the number of observations and sigma
+parameters(lin_model_int, digits = 3, 
+           include_reference = TRUE)
+nobs(lin_model_int)
+sigma(lin_model_int)
+```
+### ANSWER 
+**Intercept**
+The expected mean BMI for a mother who is unexposed, a non-smoker, highly educated, and 0 years old is estimated to be 18.64 (18.30; 18.99), which is statistically significant. This value is not practically or clinically relevant.
+
+**Exposed**
+The difference in expected mean BMI between two mothers where one is exposed and the other is unexposed—holding age, education level, and smoking status constant—is estimated to be 1.28 (1.22; 1.34) and is statistically significant.
+
+**Maternal age**
+The difference in expected mean BMI between two mothers where one is one year older than the other—given that both have the same exposure status, same education level, and are non-smokers is estimated to be 0.12 (0.11; 0.14) and is statistically significant.
+
+**Smoker**
+The difference in expected mean BMI between a smoking mother and a non-smoking mother—given that both have the same exposure status, same education level, and are 0 years old—is estimated to be -0.20 (-0.86; 0.47). This is not statistically significant.
+
+**Ex-smoker**
+The difference in expected mean BMI between an ex-smoking mother and a non-smoking mother—given that both have the same exposure status, same education level, and are 0 years old—is estimated to be 0.04 (-1.51; 1.60). This is not statistically significant 
+
+**Basic education**
+The difference in expected mean BMI between a mother with a basic education and a highly educated mother—holding exposure status, age, and smoking status constant—is estimated to be 1.74 (1.70; 1.81) and is statistically significant.
+
+**Maternal age x maternal smoking status [smoker]**
+The difference in the slope of maternal age (the effect of age per year) between smoking mothers and non-smoking mothers—holding exposure status and education level constant is estimated to be -0.03, 95% CI (-0.05; -0.004), which is statistically significant.
+
+**Maternal age x maternal smoking status [ex-smoker]**
+The difference in the slope of maternal age (the effect of age per year) between ex-smoking mothers and non-smoking mothers—holding exposure status and education level constant—is estimated to be -0.02, 95% CI (-0.07; 0.04). This is not statistically significant. 
+
+
+## THE EFFECT OF AGE FOR EACH OF THE THREE SMOKING GROUPS 
+```{r}
+# Non-smokers
+hyp0 <- hypotheses(lin_model_int, 
+                   hypothesis = "mat_age = 0", 
+                   df = lin_model_int$df.residual) |>
+  parameters(digits = 5)
+
+# Smoker
+hyp1 <- hypotheses(lin_model_int, 
+                   hypothesis = "mat_age+ `mat_age:mat_smoked_grpSmoker`=0", 
+                   df = lin_model_int$df.residual) |>
+  parameters(digits = 5)
+
+# Ex-smoker
+hyp2 <- hypotheses(lin_model_int, 
+                   hypothesis = "mat_age+ `mat_age:mat_smoked_grpEx smoker`=0", 
+                   df = lin_model_int$df.residual) |>
+  parameters(digits = 5)
+
+# Collection all above 
+samlet_resultat <- rbind(hyp0, hyp1, hyp2)
+
+# 2. Vælg de korrekte kolonner (bemærk de rigtige navne fra parameters-pakken)
+samlet_visning <- samlet_resultat |> 
+  select(Parameter, Coefficient, SE, p, CI_low, CI_high) |> 
+    mutate(Parameter = case_match(
+    Parameter,
+    "mat_age=0"                                ~ "Non-smoker",
+    "mat_age+`mat_age:mat_smoked_grpSmoker`=0"   ~ "Smoker",
+    "mat_age+`mat_age:mat_smoked_grpExsmoker`=0" ~ "Eks-smoker",
+    .default = Parameter
+  ))
+
+# Vis resultatet
+print(samlet_visning, digits = 4) 
+```
+
+*Global test (no interaction = 0)*
+Testing if the effect of maternal age modifies the mean BMI:
+```{r}
+hypotheses(lin_model_int,
+           joint = (":"))
+```
+
+*Visualization*
+```{r}
+plot_predictions(lin_model_int, 
+                 condition = c("mat_age", "mat_smoked_grp"), 
+                 df = lin_model_int$df.residual) +
+  labs(x = "Maternal age (years)", 
+       y = "Maternal BMI (kg/m^2)", 
+       title = "Figure 3: Test for no interaction",
+       color = "Smoking status", 
+       fill = "Smoking status") +
+  theme_minimal()
+```
+
+### ANSWER
+The significance of the smoking groups was investigated, adjusting for maternal age, education level, and exposure status. Here, it is observed that the effect of maternal age does not vary substantially across the smoking statuses. The three regression lines are relatively parallel regarding the increase in age, suggesting a lack of effect modification. In addition; 
+- *The confidence interval:* Although it overlaps for ex-smokers, this is highly likely due to the small sample size rather than the underlying level of significance.
+- *Interaction [ex-smokers]:* There is no statistically significant interaction between the two variables (i.e., the effect of one variable does not change depending on the level of the other).
+- *Smoking status:* There is no statistically significant difference between the categories.
+- Conclusion: The results do not suggest that smoking modifies the effect of maternal age on mean BMI (i.e., no evidence of effect modification).
+
+To formally assess this, a global test was conducted under the null hypothesis that smoking status does not modify the effect of maternal age on mean BMI. The conclusion is that there is no statistically significant effect modification between maternal age and smoking status (p = 0.069).
+
+
+
+================================================================================
+# ASSIGNMENT 2.D
+================================================================================
+Based on your model in Assignment 2.C, estimate the expected BMI for each of the two women. Furthermore, using the same model, estimate the difference in the expected BMI between the two women.
+  A) Exposed, 25 years old, non-smoker, not with a basic education
+  B) Unexposed, 31 years old, current smoker, not with a basic education
+
+
+Firstly, I need to check the names of the variables:
+```{r}
+names(coef(lin_model_int))
+```
+
+```{r}
+# Person A
+persA <- hypotheses(lin_model_int, 
+                    hypothesis = "`(Intercept)`+mat_age*25+exposureExposed=0",
+                    df = lin_model_int$df.residual) |>
+  parameters(digits = 3)
+
+# Person B
+persB <- hypotheses(lin_model_int, 
+                    hypothesis = "`(Intercept)`+mat_age*31 + 31*`mat_age:mat_smoked_grpSmoker`=0",
+                    df = lin_model_int$df.residual) |>
+  parameters(digits = 3)
+
+# Difference 
+diff <- hypotheses(lin_model_int, 
+                   hypothesis = "`(Intercept)`+mat_age*25+exposureExposed=`(Intercept)`+mat_age*31 + 31*`mat_age:mat_smoked_grpSmoker`",
+                   df = lin_model_int$df.residual) |>
+  parameters(digits = 3)
+
+# Collection all above 
+samlet_resultat <- rbind(persA, persB, diff)
+samlet_visning <- samlet_resultat |> 
+  select(Parameter, Coefficient, SE, p, CI_low, CI_high) |> 
+    mutate(Parameter = case_match(
+    Parameter,
+    "`(Intercept)`+mat_age*25+exposureExposed=0" ~ "Person A",
+    "`(Intercept)`+mat_age*31+31*`mat_age:mat_smoked_grpSmoker`=0" ~ "Person B",
+    "`(Intercept)`+mat_age*25+exposureExposed=`(Intercept)`+mat_age*31+31*`mat_age:mat_smoked_grpSmoker`" ~ "Difference",
+    .default = Parameter
+  ))
+
+# Print 
+print(samlet_visning, digits = 4) 
+```
+
+## ANSWER
+The expected BMI for Person A is estimated to be 23.01 (95% CI: 22.94; 23.07). Correspondingly, the estimated expected BMI for Person B is 21.64 (95% CI: 20.94; 22.34).
+
+The difference in expected BMI between the two individuals is estimated to be 1.37 (95% CI: 0.68; 2.05). Furthermore, this difference is statistically significant with a p-value of < 0.001.
+
+
+
+
 
 
 
