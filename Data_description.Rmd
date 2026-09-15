@@ -1,0 +1,63 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# DATASET: eksamen-statistik-1.csv
+In a *registerbased cohort study* the purpuse is to inverstage a potetial association between maternal exposure of synthetic oxytocin induced during labor and development of potentiel emotioel disorders in the child. Oxytocin is used obstetric to induce or augment labor. All singleton births between 2000 - 2001 is included. A woman can only contribute with her first birth within the perioden and the same mother can therefore only appear ones in the dataset. Exclusion has been done eg. births with scheduled c-sections. The children has been follow intil the end of 2016. 
+
+From different register information informations about the birth and the mothers lifestyle under the pregnance has been obtained. Specifically, one register about the women has been induced with synthetic oxytocin (but not to much). It is also possible to inverstegate the womens prehistorical psychological diagnosis and treatment. The exposure is emotional disturbance and is defined by whether it is registered diagnosis (eg. inserity, ADHD, PTSD, amoung others) or a registered edemption of specific medications in the registries. The child is said to have an emotional disorder by the data the diagnosis is given or the medication is edemted (whichever comes first).
+
+The dataset (eksamen-statistik-1.csv) contains as follows: 
+  - **ID:**             Fødsels-ID
+  - **exposure:**       Exposure status for synthetic oxytocin induced during birth 
+                        (Uexposed / Exposed)
+  - **year:**           Birthyear 
+                        (2000-2001 / 2002-2003 / 2004-2005 / 2006-2007 / 2008-2009 / 2010-2012)
+  - **sex:**            The gender of the child
+                        (Male / Female)
+  - **mat_age:**        Maternal age during birth (year)
+  - **mat_BMI:**        Maternal BMI in the beginning of the pregnancy (kg/m2)
+  - **mat_smoked:**     Maternal smoke-status during the pregnancy
+                        (Non-smoker / Ex smoker / Occasional smoker / Daily smoker)
+  - **mat_psych:**      Maternal psychiatric history 
+                        (No prior diagnosis / Previously diagnosed)
+  - **mat_antidrep:**   Maternal antidepressant history 
+                        (No prior redemption / Previous redemption)
+  - **mat_cohab:**      Maternal cohabitation status 
+                        (Living with partner / Not living with partner)
+  - **mat_educ:**       Maternal educational level 
+                        (Higher education / Basic education)
+  - **dob:**            Child's date of birth
+  - **date_eof:**       Date for end of follow-up (December 31, 2016)
+  - **date_emdisord:**  Date of emotional disorder
+  - **date_emigrate:**  Date of emigration
+
+Both major and minor modifications have been made to the data, and your analyses will therefore not correspond to other analyses that might be found for the same dataset. Specifically, the population has been constructed such that no deaths occur during the follow-up period.
+
+
+
+
+
+# DATASET: eksamen-statistik-2.csv
+Several methods exist for measuring oxytocin levels in the body. The dataset contains data from 139 women who have had their plasma oxytocin concentration measured. For all women, the concentration was measured using two different methods, which we will refer to as Method A and Method B.
+
+The data were collected such that the concentration was recorded as zero if the measurement fell below the detection limit of the measuring instrument.The contents of the dataset can be described as follows:
+  - **id**:     Study participant ID
+  - **oxy_A**:  Oxytocin measurement using Method A (pg/ml)
+  - **oxy_B**:  Oxytocin measurement using Method B (pg/ml)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

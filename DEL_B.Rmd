@@ -1,0 +1,508 @@
+---
+title: "Part B"
+author: "AW"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+In this section, the time from birth to the potential development of an emotional disorder in the child will be examined. The entire dataset and use the child's age as the time scale will be considered. The individuals who emigrate are considered censored. Note that the dataset has been modified such that no deaths occur during the follow-up period. Therefore it is assume that there are no competing events to the observation of emotional disorders.
+
+The data preprocessing is done in the R Markdown called *DEL_A.Rmd*. The function *source()* is used to load all the prprocessing done in that document: 
+```{r}
+source(knitr::purl("DEL_A.Rmd", 
+                   output = tempfile(), quiet = TRUE))
+```
+
+In the previous part, the dataset was called dat_del1. This is going to be rename to dat_del2 to continue a cohesive structure. In addition, the previous objects which are not being used here forward are being deleted. 
+```{r}
+# Dataset
+dat_del2 <- del1
+
+# Deleting 
+rm(collect_t_test, dat_del1, del1, diff, figure1, figure2, hyp0, hyp1, hyp2, lin_model, lin_model_int, p1, p2, p3, p4, p5, p6, persA, persB, samlet_resultat, samlet_visning, table_1A, theme)
+```
+
+Because the previous dataset used (dat_del1) only contains data in the periode 2000 - 2001, a new dataset without the periode-filtration is made: 
+```{r}
+dat_del2 <- dat_del2 |> 
+  mutate(
+    # Exposure to the use of oxytocin (pg/ml)
+    exposure = factor(exposure),
+    exposure = fct_relevel(exposure, "Unexposed"),
+    
+    # Sex     
+    sex = factor(sex),
+    sex = fct_relevel(sex, "Male"),
+    
+    # Maternal smoking status     
+    mat_smoked = factor(mat_smoked),
+    mat_smoked = fct_relevel(mat_smoked, "Non-smoker"),
+    
+    # Mother psychical diagnosed     
+    mat_psych = factor(mat_psych),
+    mat_psych = fct_relevel(mat_psych, "Previously diagnosed"),
+    
+    # Maternal using antidreprssive     
+    mat_antidrep = factor(mat_antidrep),
+    mat_antidrep = fct_relevel(mat_antidrep, "Previous redemption"),
+    
+    # Cohabitinal status     
+    mat_cohab = factor(mat_cohab),
+    mat_cohab = fct_relevel(mat_cohab, "Not living with partner"),
+    
+    # Maternal education level     
+    mat_educ = factor(mat_educ),
+    mat_educ = fct_relevel(mat_educ, "Higher education")
+    ) |> 
+  mutate(mat_smoked_grp = fct_collapse(mat_smoked,
+                                       "Smoker" = c("Occasional smoker", "Daily smoker"))) |> 
+  mutate(mat_smoked_grp = factor(mat_smoked_grp),
+         mat_smoked_grp = fct_relevel(mat_smoked_grp, "Non-smoker"))
+```
+
+
+
+# QUESTION 1
+## a. Estimate and plot the cumulative incidence of emotional disorders as a function of the child’s age for each of the two exposure groups. Provide a brief description of the plot.
+
+To answer the question, the Kaplan-Meier method is used. Normally it's typically used to estimate the survival probability at a given time point. This would correspond to estimating the probability of not experiencing the event (emotional disorders). In this case, however, the purpose is to estimate the probability of experiencing the event before a specific time point (from time 0 to time t). Therefore, the cumulative incidence is used, which is estimated as one minus the survival probability. In addition, the two cumulative incidence curves stratified by exposure status is plottet.
+
+
+### The cumulative incidence
+To estimate the cumulative incidence a status variabel and time scale firstly needs to constructed:
+  - *Status variabel*: date_out
+  - *date_out*: date_emisord
+```{r}
+dat_del2 <- dat_del2 |>
+  mutate(date_out = pmin(date_eof, date_emdisord, date_emigrate, na.rm = TRUE),
+         status = case_when(
+           date_out == date_emdisord ~ "emotional disorder",
+           .default = "Censored"
+         ),
+         status = factor(status))
+
+dat_del2 <- dat_del2 |>
+  mutate(child_age = difftime(date_out, dob, units = "days"),
+         child_age = as.numeric(child_age) / 365.25)
+```
+
+Here after, the survival function is calculated:
+```{r}
+sfit <- survfit(Surv(child_age, status == "emotional disorder") ~ exposure,
+                id = id,
+                data = dat_del2)
+
+# Eksample, age = 15
+res <- summary(sfit, times = 15)
+data.frame(
+  Exposure = res$strata,
+  Time = res$time,
+  Surv = round(res$surv, 5),
+  Std.Err = round(res$std.err, 5),
+  Lower = round(res$lower, 5),
+  Upper = round(res$upper, 5)
+)
+```
+
+
+### Graphical visualization of the cummulativ incidence 
+```{r}
+library(ggplot2)
+library(broom)
+library(dplyr)
+
+# Converting the sfit-objekt til dataframe 
+  sfit_df <- tidy(sfit)
+
+# Calculating the cumulativ incidence from the survival (1 - estimate)
+sfit_df <- sfit_df |> 
+  mutate(
+    incidence = 1 - estimate,
+    conf.low_inc = 1 - conf.high, 
+    conf.high_inc = 1 - conf.low,
+    exposure_grp = if_else(strata == "exposure=Unexposed", "Unexposed", "Exposed")   # Removing "exposure=" from the group names
+  )
+
+# The plot 
+ggplot(sfit_df, 
+       aes(x = time, 
+           y = incidence, 
+           color = exposure_grp, fill = exposure_grp)) +
+  geom_ribbon(aes(                                                             # 95%-CI
+    ymin = conf.low_inc, ymax = conf.high_inc), alpha = 0.15, color = NA) +
+  geom_step(linewidth = 0.8) +
+  scale_color_manual(values = c("#d96b52", "#3a86d4")) +
+  scale_fill_manual(values = c("#d96b52", "#3a86d4")) +
+  coord_cartesian(xlim = c(0, 17)) +
+  labs(
+    x = "Children's age (years)",
+    y = "Cumulative incidence",
+    title = "Figure 4: Cumulative incidence of emotional disorders",
+    color = "Exposure status",
+    fill = "Exposure status"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 12, margin = margin(b = 10)),
+    legend.position = "right" 
+  )
+```
+The two groups follow each other proportionally from age 0 to 16 years. The curves, which reflect the probability of developing an emotional disorder, begin to rise at approximately 7 years of age. For both curves, the incidence increases more sharply during the teenage years.The incidence is generally higher for the exposed group compared to the unexposed group. It is noted that a slightly wider 95% confidence interval (shaded areas) is observed for the exposed group compared to the unexposed group.
+
+
+
+## b. Estimate the overall incidence rate of emotional disorders in the entire population, as well as the incidence rate ratio between the two exposure groups.
+
+Here, a Poisson regression to investigate the effect of time on the incidence. All estimates in the following section are reported per 10,000 person-years. 
+
+First, *the incidence rate (IR)* and *the incidence rate ratio (IRR)* of emotional disorders for the entire population is estimated:
+```{r}
+cat("\n--- PERSON-TIME PER EXPOSURE GROUP ---\n")
+py <- pyears(Surv(child_age, status == "emotional disorder") ~ exposure,
+             scale = 10000,
+             data.frame = TRUE,
+             data = dat_del2)
+py$data |> 
+  as_tibble() |> 
+  print()
+
+cat("\n--- OVERALL INCIDENCE RATE (IR) ---\n")
+poiss <- glm(event ~ offset(log(pyears)),
+             family = poisson,
+             data = py$data)
+parameters(poiss, exponentiate = TRUE, digits = 5)
+
+cat("\n--- INCIDENCE RATE RATIO (IRR) ---\n")
+poiss_exposure <- glm(event ~ offset(log(pyears)) + exposure,
+                    family = poisson,
+                    data = py$data)
+parameters(poiss_exposure, exponentiate = TRUE, digits = 5, 
+           include_reference = TRUE)
+```
+A regression analysis (*Poisson test*) without explanatory variables (an intercept-only model) is calculated to check if the overall incidence rate is calculated correct:
+```{r}
+cat("\n--- POISSON TEST ---\n")
+poisson.test(sum(py$data$event), T = sum(py$data$pyears))
+```
+
+**Intercept**
+*The overall incidence rate (IR)* of emotional disorders for the entire population is estimated to be 8,82 cases per 10,000 person-years (95% CI: 8.55, 9.10) while *the incidence rate ratio (IRR)*, from the second model, shows that the baseline incidence rate among unexposed children is 8.88 cases per 10,000 person-years (95% CI: 8.54, 9.23).
+
+**Comparing the two groups**
+Children exposed to synthetic oxytocin during labor have an *Incidence Rate Ratio (IRR)* of 0.98 (95% CI: 0.92, 1.05). This indicates a non-statistically significant 2% lower rate of developing emotional disorders during the follow-up period compared to unexposed children (p > 0,05).
+
+
+
+# QUESTION 2
+## a. We wish to compare the hazard (instantaneous risk) of emotional disorders between the two exposure groups, still using the child’s age as the time scale. Formulate a regression model for this purpose and interpret the results.
+
+To compare the hazard, a Cox regression is applied to estimate the effect independently of the time perspective.
+```{r}
+cox <- coxph(Surv(child_age, status == "emotional disorder") ~ exposure, 
+             data = dat_del2)
+parameters(cox, exponentiate = TRUE)
+nobs(cox)
+```
+*The hazard ratio (HR)* for emotional disorders for an exposed child compared to an unexposed child is estimated to be 1.13 (95% CI: 1.06, 1.20), ergo 13% increased hazard/instantaneous risk, at any given time point during the study. The HR assesses whether the effect remains constant regardless of when the two groups are compared. 
+
+
+
+## b. In the model from Question 4.a, there is an assumption of proportional hazards. Describe this assumption and investigate its validity.
+
+Cox regression is based on the same assumptions as Poisson regression, though now on the log-hazard scale. The assumption in 2.b regarding proportional hazards means that the effect of an explanatory variable remains constant over time on the chosen time scale. The model is built upon a single explanatory variable, exposure status, which is a categorical variable; therefore, no further categorization is required before constructing the log-log plot.
+
+```{r}
+library(ggplot2)
+library(broom)
+library(dplyr)
+
+# Calculating the survfit object
+sfit_cloglog <- survfit(Surv(child_age, status == "emotional disorder") ~ exposure,
+                        data = dat_del2)
+
+# Recoding the object to a dataframe + making a cloglog-transformation 
+sfit_cloglog_df <- tidy(sfit_cloglog) |> 
+  mutate(
+    cloglog_val = log(-log(estimate)),
+    exposure_grp = if_else(strata == "exposure=Unexposed", "Unexposed", "Exposed")
+  ) |> 
+  filter(time > 3 & time <= 12)  
+
+# Making the plot 
+ggplot(sfit_cloglog_df, 
+       aes(x = time, y = cloglog_val, color = exposure_grp)) +
+  geom_step(linewidth = 0.8) +                           # Stepwise log-log lines
+  scale_color_manual(values = c("#d96b52", "#3a86d4")) +
+  labs(
+    x = "Children's age (years)",
+    y = "log(-log(Survival))",
+    title = "Figure 5: Log-log plot for testing proportional hazards",
+    color = "Exposure status"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 12, margin = margin(b = 10)),
+    legend.position = "right"
+  )
+```
+
+In addition, a Schoenfeld residual plot is constructed to help with the investigating of the validity: 
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# 1. Beregn residualerne via overlevelsesanalysen
+test_ph <- cox.zph(cox)
+
+# 2. Træk de KORREKTE transformerede data ud af objektet
+zph_df <- data.frame(
+  time = test_ph$x,          # test_ph$x indeholder den transformerede tid, som standard-plottet bruger!
+  residuals = test_ph$y[, 1] # Residualerne for første variabel
+)
+
+# 3. Lav dit skræddersyede ggplot, som nu matcher perfekt
+ggplot(zph_df, aes(x = time, y = residuals)) +
+  geom_point(colour = "#3a86d4", alpha = 0.2, size = 0.8) +
+  geom_smooth(color = "#d96b52", method = "loess", se = TRUE, 
+              fill = "#d96b52", alpha = 0.1, linewidth = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  labs(
+    title = "Figur 6: Schoenfeld residualplot for eksponeringsstatus",
+    x = "Transformeret tid (KM)",
+    y = "Skalerede Schoenfeld residualer"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 11, margin = margin(b = 10))
+  )
+
+```
+The assumption is assessed based on the vertical distance between the curves. Ideally, the curves should run parallel to one another to conclude that no effect modification is present. In this case, the two curves follow each other with a consistently stable distance. A crossover is observed around 6 years of age; however, this is not a cause for concern, as it may be attributed to a small number of events. Therefore, the hypothesis of no effect modification between exposure status and the development of emotional disorders is accepted.Furthermore, this is supplemented by a Schoenfeld residual plot, where the trend line is assumed to be flat.
+
+
+## c. To investigate whether a prior maternal psychiatric diagnosis modifies the effect of the exposure, while additionally adjusting for maternal smoking status (recoded into three categories), maternal age, and year of birth. Formulate a regression model and interpret the results with respect to this question. Since there are few events in the years 2010–2012, you must combine this group with the preceding one, so that the years 2008–2012 are considered a single group. Furthermore, the response must include an estimate of the effect of exposure for each of the two psychiatric diagnosis groups.
+
+To answer the question, the preceding Cox regression is applied, adjusting for *maternal smoking status*, *maternal age*, and *the child's year of birth*, as well as an *interaction between a prior maternal psychiatric diagnosis and exposure status*. Since there are few events in the years 2010–2012, this group is combined with the preceding one, such that the years 2008–2012 are considered a single group. We have noted missing values for maternal smoking status, and these are removed for this analysis.
+
+### Recoding the periods 
+```{r}
+dat_del2 <- dat_del2 |> mutate(dat_del2,
+                               year_grp = fct_collapse(year, "2008-2012" = c("2008-2009", "2010-2012")))
+```
+
+
+### Cox-regression
+```{r}
+cox_Int <- coxph(Surv(child_age, 
+                      status == "emotional disorder") ~ exposure * mat_psych + mat_smoked_grp + mat_age + year_grp,
+                 na.action = "na.exclude",
+                 data = dat_del2)
+parameters(cox_Int, exponentiate = TRUE, include_reference = TRUE, digits = 3)
+nobs(cox_Int)
+```
+**Exposure Status [Exposed]**
+*The Hazard Ratio (HR)* for emotional disorders for an exposed child compared to an unexposed child is estimated to be 0.761 (95% CI: 0.676; 0.858), which is statistically significant (p < 0.001). This applies when comparing children who share the same birth year group, whose mødre are of the same age and smoking status, and where both mødre are previously diagnosed with a psychiatric condition. This indicates that at any given time point during the study, exposed children have a 23.9% lower hazard (instantaneous risk) of developing an emotional disorder compared to unexposed children within this specific psychiatric subgroup.
+
+**Maternal Psychiatric History [No prior diagnosis]**
+Holding exposure status, birth year group, maternal age, and smoking status constant, the HR for emotional disorders for a child whose mother has no prior diagnosis compared to a child whose mother is previously diagnosed is estimated to be 0.157 (95% CI: 0.143; 0.173), which is statistically significant (p < 0.001). Consequently, assuming both children are unexposed, *the hazard* at any given time point in the study is 84.3% lower for children whose mødre have no prior psychiatric history.
+
+**Maternal Smoking Status [Smoker]**
+The HR for emotional disorders for a child whose mother is a smoker compared to a child whose mother is a non-smoker is estimated to be 1.475 (95% CI: 1.376; 1.581), which is statistically significant (p < 0.001). This means that when comparing two children with identical exposure status, birth year group, maternal psychiatric history, and maternal age, the hazard at any given time point in the study is 47.5% higher for the child with a smoking mother.
+
+**Maternal Smoking Status [Ex-smoker]**
+Comparing a child whose mother is an ex-smoker to a child whose mother is a non-smoker, the HR for emotional disorders is estimated to be 1.393 (95% CI: 1.187; 1.635), which is statistically significant (p < 0.001). Under identical background characteristics for exposure, birth year, maternal psychiatric history, and age, the hazard at any given time point in the study is 39.3% higher for the child of an ex-smoker.
+
+**Maternal Age**
+For each additional year of maternal age, the hazard of the child developing an emotional disorder decreases by 9.4%, holding all other variables constant. This is reflected by an estimated HR of 0.906 (95% CI: 0.895; 0.917), which is statistically significant (p < 0.001).
+
+**Birth Year Group [2002–2003]**
+The HR for emotional disorders for a child born in 2002–2003 compared to a child born in the reference period 2000–2001 is estimated to be 0.330 (95% CI: 0.304; 0.358), which is statistically significant (p < 0.001). Given identical background characteristics, the hazard at any given time point in the study is 67.0% lower for the child born in 2002–2003.(The remaining birth year groups are interpreted correspondingly, demonstrating a progressive decline in the hazard for later birth cohorts due to the shorter follow-up period; specifically, an 84.8% reduction for 2004–2005 with an HR of 0.152, a 92.0% reduction for 2006–2007 with an HR of 0.080, and a 98.3% reduction for 2008–2012 with an HR of 0.017).
+
+**Exposure [Exposed] × Maternal Psychiatric History [No prior diagnosis]**
+The interaction term is estimated to be 1.222 (95% CI: 1.060; 1.410), which is statistically significant (p = 0.006). This term represents the additional multiplicative factor that must be applied to the exposure effect when moving from the reference group (mothers with a prior diagnosis) to mothers with no prior psychiatric diagnosis. This indicates that the relative impact of oxytocin exposure on the child's hazard of emotional disorders is significantly modified by maternal psychiatric history, making the hazard ratio for exposure 22.2% higher among children whose mødre have no prior psychiatric diagnosis compared to those whose mødre are previously diagnosed.
+
+
+### The effect of exposure for each of the two psychiatric diagnosis groups.
+
+To assess whether the effect of oxytocin exposure on the child’s risk of developing an emotional disorder is modified by maternal psychiatric history, separate Hazard Ratios (HR) were estimated for each group:
+```{r}
+# Previously diagnosed
+hyp0 <- hypotheses(cox_Int,
+                   hypothesis = "exposureExposed = 0")
+
+# No prior diagnosis
+hyp1 <- hypotheses(cox_Int,
+                   hypothesis =  "exposureExposed + `exposureExposed:mat_psychNo prior diagnosis` = 0")
+
+# Collection all above
+samlet_resultat <- rbind(hyp0, hyp1)
+samlet_visning <- samlet_resultat |> 
+  parameters(exponentiate = TRUE, digits = 5) |> 
+  
+  select(Parameter, Coefficient, SE, p, CI_low, CI_high) |> 
+  mutate(Parameter = case_match(
+    Parameter,
+    "exposureExposed=0" ~ "Previously diagnosed",
+    "exposureExposed+`exposureExposed:mat_psychNopriordiagnosis`=0" ~ "No prior diagnosis",
+    .default = Parameter
+  ))
+
+print(samlet_visning, digits = 4)
+```
+**Maternal Psychiatric History [Previously diagnosed]**
+Among children whose mødre have a prior psychiatric diagnosis, exposure to synthetic oxytocin during labor is associated with a statistically significant decrease in the hazard of developing an emotional disorder (HR = 0.7614; 95% CI: 0.6758; 0.8579; p < 0.001). Holding all other covariates constant, exposed children in this subgroup have a 23.9% lower hazard (instantaneous risk) compared to unexposed children.
+
+**Maternal Psychiatric History [No prior diagnosis]**
+In contrast, among children whose mødre have no prior psychiatric diagnosis, the effect of oxytocin exposure is not statistically significant (HR = 0.9307; 95% CI: 0.8580; 1.0095; p = 0.083). Although the point estimate suggests a 6.9% lower hazard for the exposed group, the 95% confidence interval includes 1.00, meaning we cannot rule out the possibility of no effect.
+
+**Conclusion**
+Because *the hazard ratios* differ substantially between the two strata, and since the underlying interaction term was statistically significant (p = 0.006), the conclusion is that maternal psychiatric history acts as a *significant effect modifier*. The protective or downward shift in hazard associated with oxytocin exposure is exclusively observed and statistically reliable among children born to mødre with a pre-existing psychiatric history.
+
+
+
+# QUESTION 3
+
+Hereby foreward, instead of using the *eksamen-statistik-1.csv*, *eksamen-statistik-2.csv* is going to be used
+```{r}
+# Cleaning the environment 
+rm(list = ls())
+
+# Read the new dataset 
+del2 <- read_csv("eksamen-statistik-2.csv")
+```
+
+## a. Assess the agreement between the two measurement methods, A and B.
+
+Agreement between two measurement methods corresponds to a paired design, in accordance with Situation 3, where each individual contributes two observations. In this case, the measurements are taken under identical conditions using two different measurement methods. *A scatter plot* is constructed to visualize the agreement.
+```{r}
+ggplot(aes(x = oxy_B, y = oxy_A), data = del2) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0) +
+  labs(x = "Metode A", y = "Metode B") +
+  labs(
+    title = "Figur 7: Scatter plot",
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 11, margin = margin(b = 10))
+  )
+
+```
+
+
+There is no systematic difference between the two measurements is observed in *the scatter plot*, as the data points do not lie systematically above or below the identity line; thus, the variation around the line reflects the random variation between the measurement methods.
+
+Additionally, the mean difference, standard deviation, and correlation are estimated.
+```{r}
+# Differens + mean
+del2 <- del2 |>
+  mutate(dif = oxy_B - oxy_A,
+         avg = (oxy_A + oxy_B)/2)
+
+# Paired t-test with the estimate systematic differens
+t.test(dif ~ 1, data = del2) |>
+  parameters(digits =  3)
+
+# Varians of difference and limits of agreement
+cat("\n--- VARIANS OF DIFFERENCE ---\n")
+var.test(dif ~ 1, data = del2) |>
+  mutate(Estimate = sqrt(Estimate),
+         CI_low = sqrt(CI_low),
+         CI_high = sqrt(CI_high),
+         .keep = "none") |>
+  print(digits = 3)
+
+# Limits of agreement 
+mean_est <- mean(del2$dif)
+sd_est <- sd(del2$dif)
+pi_low <- mean_est - 1.96*sd_est
+pi_high <- mean_est + 1.96*sd_est
+cat("\n--- LIMITS OF AGREEMENT ---\n")
+data.frame(PI_low = pi_low, PI_high = pi_high) |>
+  print(digits = 3)
+
+# Correlation between measurements
+cat("\n--- CORRELATION-TEST ---\n")
+cor.test( ~ oxy_A + oxy_B, data = del2, method = "spearman") |>
+  parameters()
+```
+The mean difference reflects the systematic difference in averages between the two measurements and is estimated to be 0.03 (95% CI: -0.11; 0.17), which is considered a small difference. Furthermore, this difference is not statistically significant (p = 0.68), which is also apparent since 0 is included within the confidence interval.The random variation is assessed by an estimated standard deviation of the differences of 0.83 (95% CI: 0.74; 0.94). A 95% prediction interval for the differences, the Limits of Agreement, is estimated to be (-1.60; 1.70); therefore, the difference between the two measurements will, with high probability, not exceed 1.70. This interval provides information about the precision of the measurement method and should be evaluated based on clinical knowledge.This is supplemented by a correlation test, which measures the strength of a potential dependence between the two measurement methods. The Spearman correlation is applied because it measures a monotonic relationship.Correlation coefficients range from (-1; 1), where 1 signifies a perfect positive monotonic relationship. In this case, a correlation of 0.90 is obtained, from which a high degree of agreement between the two measurement methods is concluded. However, a strong correlation does not always imply good agreement.
+
+The aforementioned estimates are visualized using a Bland-Altman plot:
+```{r}
+ttest <- t.test(dif ~ 1, data = del2) |> parameters()
+mean_est <- ttest$Mean
+ci_low <- ttest$CI_low
+ci_high <- ttest$CI_high
+sd_est <- sd(del2$dif)
+pi_low <- mean_est - 1.96*sd_est
+pi_high <- mean_est + 1.96*sd_est
+
+ggplot(aes(x = avg, y = dif), data = del2) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "black") +
+  geom_hline(yintercept = mean_est, color = "red") +
+  geom_hline(yintercept = ci_low, color = "red", linetype = "dashed") +
+  geom_hline(yintercept = ci_high, color = "red", linetype = "dashed") +
+  geom_hline(yintercept = pi_low, color = "blue", linetype = "dashed") +
+  geom_hline(yintercept = pi_high, color = "blue", linetype = "dashed") +
+  labs(x = "Mean", 
+       y = "Difference",
+       title = "Figure 8: Bland-Altman plot") +
+    theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 11, margin = margin(b = 10))
+  )
+```
+The Bland-Altman plot shows that the zero line (the black line) is contained within the limits of agreement (the red dashed lines). Because the zero line falls within these bounds, it is plausible that the true mean difference could be equal to zero, indicating no systematic difference between the two measurement methods. However, values that fell below the detection limit of the measuring instruments were included in the analysis, which could potentially impact the results of the study.
+
+
+
+
+# QUESTION 4
+A group of researchers wishes to evaluate a new intervention designed to increase natural oxytocin levels in women during labor. They plan a *randomized controlled trial (RCT)* with a *1:1 allocation ratio*, randomly assigning laboring women to either the new intervention or usual care. The research group expects the new intervention to lead to an *increase in mean oxytocin of 2 pg/ml*. The group considers an increase in the mean of *1 pg/ml to be the minimum clinically relevant difference*. Thus, they wish to design the study to reject the hypothesis that the intervention effect on mean oxytocin is less than this minimum relevant threshold. The women's oxytocin levels will be measured using the approach referred to as Method A in previouse question.
+  - **delta:**      Difference in detection *minimal clinically important difference (MCID)* 
+                    delta = 1 (2 pg/ml - 1 pg/ml = 1 pg/ml)
+  - **sd:**         Standard deviation from previous question
+                    sd(del2$oxy_A, na.rm = TRUE)
+  - **power:**      90% power = 0,90
+  - **sign.level:** 5% significans level
+
+Since the research group knows you possess the data from previouse question, they ask you to provide an estimate for the relevant standard deviation of the oxytocin measurements, assuming that the standard deviation between women is identical across the two groups.
+
+
+## a. Calculate the required sample size for the researchers to reject their hypothesis with 90% power and a 5% (two-sided) significance level.
+
+Firstly, the number, SD, mean and the 95%-CI is calculated: 
+```{r}
+del2 |>
+  summarise(n = n(),
+            sd = sd(oxy_A),
+            mean = mean(oxy_A),
+            lwr = mean(oxy_A) - 1.96 * sd(oxy_A),
+            upp = mean(oxy_A) + 1.96 * sd(oxy_A))
+```
+
+```{r}
+pwrss.t.2means(
+  mu1 = 2,           # The group increase in the mean
+  mu2 = 0,           
+  sd1 = 1.996527,    # The actually varians (SD) from above data
+  sd2 = 1.996527,    
+  power = 0.90,      # 90% styrke
+  margin = 1,        # MCID
+  alpha = 0.05,      # 5% signifikansniveau
+  alternative = "superior"
+)
+```
+Based on the plasma oxytocin measurements from Part C (Method A), the common standard deviation between women was estimated to be \(\sigma = 1.9965\). To design a study capable of rejecting the null hypothesis (that the intervention effect is less than the minimum clinically relevant difference of \(1\text{ pg/ml}\)) with \(90\%\) power and a \(5\%\) significance level, a power analysis for a two-sample superior t-test was conducted.Assuming an expected mean increase of \(2\text{ pg/ml}\) under the new intervention and a \(1:1\) allocation ratio, the researchers require a sample size of 91 women per group, yielding a total study population of 182 women.
+
+
+## b. Briefly discuss the researchers' choice of a clinically relevant effect threshold of 1 pg/ml, drawing upon your findings from previous question.
+Drawing upon the descriptive findings from previous question, the researchers' choice of a \(1\text{ pg/ml}\) threshold warrants critical discussion:
+  - **In relation to the sample mean:** In previous question, the baseline mean oxytocin concentration measured by Method A was only \(2.97\text{ pg/ml}\). An increase of \(1\text{ pg/ml}\) therefore represents a massive relative expansion of approximately \(34\%\) from the baseline average. Targeting such a substantial shift as the minimum important difference might be overly optimistic.
+  - **In relation to the random variation:** The SD within the population (\(\sigma = 1.9965\)) is twice as large as the minimum relevant threshold (\(1\text{ pg/ml}\)). This indicates substantial natural variation between women. Because the signal (the threshold of \(1\text{ pg/ml}\)) is relatively weak compared to the noise (the standard deviation of \(\sim 2\text{ pg/ml}\)), detecting this specific boundary requires a larger sample size to ensure that natural fluctuations do not mask the true intervention effect.
+
+
+
+
+

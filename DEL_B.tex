@@ -1,0 +1,1406 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={Part B},
+  pdfauthor={AW},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Part B}
+\author{AW}
+\date{2026-09-14}
+
+\begin{document}
+\maketitle
+
+In this section, the time from birth to the potential development of an
+emotional disorder in the child will be examined. The entire dataset and
+use the child's age as the time scale will be considered. The
+individuals who emigrate are considered censored. Note that the dataset
+has been modified such that no deaths occur during the follow-up period.
+Therefore it is assume that there are no competing events to the
+observation of emotional disorders.
+
+The data preprocessing is done in the R Markdown called
+\emph{DEL\_A.Rmd}. The function \emph{source()} is used to load all the
+prprocessing done in that document:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{source}\NormalTok{(knitr}\SpecialCharTok{::}\FunctionTok{purl}\NormalTok{(}\StringTok{"DEL\_A.Rmd"}\NormalTok{, }
+                   \AttributeTok{output =} \FunctionTok{tempfile}\NormalTok{(), }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Indlæser krævet pakke: tidyverse
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'tidyverse' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'ggplot2' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'tibble' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'tidyr' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'readr' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'purrr' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'dplyr' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'stringr' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'forcats' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'lubridate' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.6
+## v forcats   1.0.1     v stringr   1.6.0
+## v ggplot2   4.0.1     v tibble    3.3.1
+## v lubridate 1.9.4     v tidyr     1.3.2
+## v purrr     1.2.1
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+## Registered S3 methods overwritten by 'statistik':
+##   method           from 
+##   var.test.default stats
+##   var.test.formula stats
+## 
+## 
+## Vedhæfter pakke: 'statistik'
+## 
+## 
+## Det følgende objekt er maskeret fra 'package:stats':
+## 
+##     poisson.test
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'lme4' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Indlæser krævet pakke: Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'Matrix' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Vedhæfter pakke: 'Matrix'
+## 
+## De følgende objekter er maskerede fra 'package:tidyr':
+## 
+##     expand, pack, unpack
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'lmerTest' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Vedhæfter pakke: 'lmerTest'
+## 
+## Det følgende objekt er maskeret fra 'package:lme4':
+## 
+##     lmer
+## 
+## Det følgende objekt er maskeret fra 'package:stats':
+## 
+##     step
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'survival' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'pwrss' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Vedhæfter pakke: 'pwrss'
+## 
+## Det følgende objekt er maskeret fra 'package:stats':
+## 
+##     power.t.test
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'presize' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'patchwork' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'parameters' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: pakke 'ggdag' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Vedhæfter pakke: 'ggdag'
+## 
+## De følgende objekter er maskerede fra 'package:statistik':
+## 
+##     label, label<-
+## 
+## Det følgende objekt er maskeret fra 'package:stats':
+## 
+##     filter
+## 
+## Rows: 442817 Columns: 15-- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr  (8): exposure, year, sex, mat_smoked, mat_psych, mat_antidrep, mat_coha...
+## dbl  (3): id, mat_age, mat_BMI
+## date (4): dob, date_eof, date_emdisord, date_emigrate
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha =
+## 0.65, : Ignoring unknown parameters: `size`
+\end{verbatim}
+
+\begin{verbatim}
+## # Fixed Effects
+## 
+## Parameter  | Coefficient |     SE |      p |               CI
+## -------------------------------------------------------------
+## Non-smoker |      0.1235 | 0.0063 | < .001 | [0.1112, 0.1358]
+## Smoker     |      0.0967 | 0.0103 | < .001 | [0.0765, 0.1170]
+## Eks-smoker |      0.1042 | 0.0271 | < .001 | [0.0511, 0.1573]
+## # Fixed Effects
+## 
+## Parameter  | Coefficient |     SE |      p |                 CI
+## ---------------------------------------------------------------
+## Person A   |     23.0070 | 0.0323 | < .001 | [22.9437, 23.0703]
+## Person B   |     21.6392 | 0.3587 | < .001 | [20.9361, 22.3422]
+## Difference |      1.3678 | 0.3499 | < .001 | [ 0.6819,  2.0537]
+\end{verbatim}
+
+In the previous part, the dataset was called dat\_del1. This is going to
+be rename to dat\_del2 to continue a cohesive structure. In addition,
+the previous objects which are not being used here forward are being
+deleted.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dataset}
+\NormalTok{dat\_del2 }\OtherTok{\textless{}{-}}\NormalTok{ del1}
+
+\CommentTok{\# Deleting }
+\FunctionTok{rm}\NormalTok{(collect\_t\_test, dat\_del1, del1, diff, figure1, figure2, hyp0, hyp1, hyp2, lin\_model, lin\_model\_int, p1, p2, p3, p4, p5, p6, persA, persB, samlet\_resultat, samlet\_visning, table\_1A, theme)}
+\end{Highlighting}
+\end{Shaded}
+
+Because the previous dataset used (dat\_del1) only contains data in the
+periode 2000 - 2001, a new dataset without the periode-filtration is
+made:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat\_del2 }\OtherTok{\textless{}{-}}\NormalTok{ dat\_del2 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \CommentTok{\# Exposure to the use of oxytocin (pg/ml)}
+    \AttributeTok{exposure =} \FunctionTok{factor}\NormalTok{(exposure),}
+    \AttributeTok{exposure =} \FunctionTok{fct\_relevel}\NormalTok{(exposure, }\StringTok{"Unexposed"}\NormalTok{),}
+    
+    \CommentTok{\# Sex     }
+    \AttributeTok{sex =} \FunctionTok{factor}\NormalTok{(sex),}
+    \AttributeTok{sex =} \FunctionTok{fct\_relevel}\NormalTok{(sex, }\StringTok{"Male"}\NormalTok{),}
+    
+    \CommentTok{\# Maternal smoking status     }
+    \AttributeTok{mat\_smoked =} \FunctionTok{factor}\NormalTok{(mat\_smoked),}
+    \AttributeTok{mat\_smoked =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_smoked, }\StringTok{"Non{-}smoker"}\NormalTok{),}
+    
+    \CommentTok{\# Mother psychical diagnosed     }
+    \AttributeTok{mat\_psych =} \FunctionTok{factor}\NormalTok{(mat\_psych),}
+    \AttributeTok{mat\_psych =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_psych, }\StringTok{"Previously diagnosed"}\NormalTok{),}
+    
+    \CommentTok{\# Maternal using antidreprssive     }
+    \AttributeTok{mat\_antidrep =} \FunctionTok{factor}\NormalTok{(mat\_antidrep),}
+    \AttributeTok{mat\_antidrep =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_antidrep, }\StringTok{"Previous redemption"}\NormalTok{),}
+    
+    \CommentTok{\# Cohabitinal status     }
+    \AttributeTok{mat\_cohab =} \FunctionTok{factor}\NormalTok{(mat\_cohab),}
+    \AttributeTok{mat\_cohab =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_cohab, }\StringTok{"Not living with partner"}\NormalTok{),}
+    
+    \CommentTok{\# Maternal education level     }
+    \AttributeTok{mat\_educ =} \FunctionTok{factor}\NormalTok{(mat\_educ),}
+    \AttributeTok{mat\_educ =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_educ, }\StringTok{"Higher education"}\NormalTok{)}
+\NormalTok{    ) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mat\_smoked\_grp =} \FunctionTok{fct\_collapse}\NormalTok{(mat\_smoked,}
+                                       \StringTok{"Smoker"} \OtherTok{=} \FunctionTok{c}\NormalTok{(}\StringTok{"Occasional smoker"}\NormalTok{, }\StringTok{"Daily smoker"}\NormalTok{))) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mat\_smoked\_grp =} \FunctionTok{factor}\NormalTok{(mat\_smoked\_grp),}
+         \AttributeTok{mat\_smoked\_grp =} \FunctionTok{fct\_relevel}\NormalTok{(mat\_smoked\_grp, }\StringTok{"Non{-}smoker"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\section{QUESTION 1}\label{question-1}
+
+\subsection{a. Estimate and plot the cumulative incidence of emotional
+disorders as a function of the child's age for each of the two exposure
+groups. Provide a brief description of the
+plot.}\label{a.-estimate-and-plot-the-cumulative-incidence-of-emotional-disorders-as-a-function-of-the-childs-age-for-each-of-the-two-exposure-groups.-provide-a-brief-description-of-the-plot.}
+
+To answer the question, the Kaplan-Meier method is used. Normally it's
+typically used to estimate the survival probability at a given time
+point. This would correspond to estimating the probability of not
+experiencing the event (emotional disorders). In this case, however, the
+purpose is to estimate the probability of experiencing the event before
+a specific time point (from time 0 to time t). Therefore, the cumulative
+incidence is used, which is estimated as one minus the survival
+probability. In addition, the two cumulative incidence curves stratified
+by exposure status is plottet.
+
+\subsubsection{The cumulative incidence}\label{the-cumulative-incidence}
+
+To estimate the cumulative incidence a status variabel and time scale
+firstly needs to constructed: - \emph{Status variabel}: date\_out -
+\emph{date\_out}: date\_emisord
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat\_del2 }\OtherTok{\textless{}{-}}\NormalTok{ dat\_del2 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{date\_out =} \FunctionTok{pmin}\NormalTok{(date\_eof, date\_emdisord, date\_emigrate, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+         \AttributeTok{status =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{           date\_out }\SpecialCharTok{==}\NormalTok{ date\_emdisord }\SpecialCharTok{\textasciitilde{}} \StringTok{"emotional disorder"}\NormalTok{,}
+           \AttributeTok{.default =} \StringTok{"Censored"}
+\NormalTok{         ),}
+         \AttributeTok{status =} \FunctionTok{factor}\NormalTok{(status))}
+
+\NormalTok{dat\_del2 }\OtherTok{\textless{}{-}}\NormalTok{ dat\_del2 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{child\_age =} \FunctionTok{difftime}\NormalTok{(date\_out, dob, }\AttributeTok{units =} \StringTok{"days"}\NormalTok{),}
+         \AttributeTok{child\_age =} \FunctionTok{as.numeric}\NormalTok{(child\_age) }\SpecialCharTok{/} \FloatTok{365.25}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Here after, the survival function is calculated:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sfit }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(child\_age, status }\SpecialCharTok{==} \StringTok{"emotional disorder"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ exposure,}
+                \AttributeTok{id =}\NormalTok{ id,}
+                \AttributeTok{data =}\NormalTok{ dat\_del2)}
+
+\CommentTok{\# Eksample, age = 15}
+\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(sfit, }\AttributeTok{times =} \DecValTok{15}\NormalTok{)}
+\FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Exposure =}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{strata,}
+  \AttributeTok{Time =}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{time,}
+  \AttributeTok{Surv =} \FunctionTok{round}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{surv, }\DecValTok{5}\NormalTok{),}
+  \AttributeTok{Std.Err =} \FunctionTok{round}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{std.err, }\DecValTok{5}\NormalTok{),}
+  \AttributeTok{Lower =} \FunctionTok{round}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{lower, }\DecValTok{5}\NormalTok{),}
+  \AttributeTok{Upper =} \FunctionTok{round}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{upper, }\DecValTok{5}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             Exposure Time    Surv Std.Err   Lower   Upper
+## 1 exposure=Unexposed   15 0.97356 0.00062 0.97233 0.97478
+## 2   exposure=Exposed   15 0.97066 0.00093 0.96884 0.97249
+\end{verbatim}
+
+\subsubsection{Graphical visualization of the cummulativ
+incidence}\label{graphical-visualization-of-the-cummulativ-incidence}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(broom)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: pakke 'broom' blev bygget under R version 4.4.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# Converting the sfit{-}objekt til dataframe }
+\NormalTok{  sfit\_df }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(sfit)}
+
+\CommentTok{\# Calculating the cumulativ incidence from the survival (1 {-} estimate)}
+\NormalTok{sfit\_df }\OtherTok{\textless{}{-}}\NormalTok{ sfit\_df }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{incidence =} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ estimate,}
+    \AttributeTok{conf.low\_inc =} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ conf.high, }
+    \AttributeTok{conf.high\_inc =} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ conf.low,}
+    \AttributeTok{exposure\_grp =} \FunctionTok{if\_else}\NormalTok{(strata }\SpecialCharTok{==} \StringTok{"exposure=Unexposed"}\NormalTok{, }\StringTok{"Unexposed"}\NormalTok{, }\StringTok{"Exposed"}\NormalTok{)   }\CommentTok{\# Removing "exposure=" from the group names}
+\NormalTok{  )}
+
+\CommentTok{\# The plot }
+\FunctionTok{ggplot}\NormalTok{(sfit\_df, }
+       \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }
+           \AttributeTok{y =}\NormalTok{ incidence, }
+           \AttributeTok{color =}\NormalTok{ exposure\_grp, }\AttributeTok{fill =}\NormalTok{ exposure\_grp)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(                                                             }\CommentTok{\# 95\%{-}CI}
+    \AttributeTok{ymin =}\NormalTok{ conf.low\_inc, }\AttributeTok{ymax =}\NormalTok{ conf.high\_inc), }\AttributeTok{alpha =} \FloatTok{0.15}\NormalTok{, }\AttributeTok{color =} \ConstantTok{NA}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_step}\NormalTok{(}\AttributeTok{linewidth =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"\#d96b52"}\NormalTok{, }\StringTok{"\#3a86d4"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"\#d96b52"}\NormalTok{, }\StringTok{"\#3a86d4"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{coord\_cartesian}\NormalTok{(}\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{17}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Children\textquotesingle{}s age (years)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Cumulative incidence"}\NormalTok{,}
+    \AttributeTok{title =} \StringTok{"Figure 4: Cumulative incidence of emotional disorders"}\NormalTok{,}
+    \AttributeTok{color =} \StringTok{"Exposure status"}\NormalTok{,}
+    \AttributeTok{fill =} \StringTok{"Exposure status"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{12}\NormalTok{, }\AttributeTok{margin =} \FunctionTok{margin}\NormalTok{(}\AttributeTok{b =} \DecValTok{10}\NormalTok{)),}
+    \AttributeTok{legend.position =} \StringTok{"right"} 
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{DEL_B_files/figure-latex/unnamed-chunk-6-1.pdf}}
+The two groups follow each other proportionally from age 0 to 16 years.
+The curves, which reflect the probability of developing an emotional
+disorder, begin to rise at approximately 7 years of age. For both
+curves, the incidence increases more sharply during the teenage
+years.The incidence is generally higher for the exposed group compared
+to the unexposed group. It is noted that a slightly wider 95\%
+confidence interval (shaded areas) is observed for the exposed group
+compared to the unexposed group.
+
+\subsection{b. Estimate the overall incidence rate of emotional
+disorders in the entire population, as well as the incidence rate ratio
+between the two exposure
+groups.}\label{b.-estimate-the-overall-incidence-rate-of-emotional-disorders-in-the-entire-population-as-well-as-the-incidence-rate-ratio-between-the-two-exposure-groups.}
+
+Here, a Poisson regression to investigate the effect of time on the
+incidence. All estimates in the following section are reported per
+10,000 person-years.
+
+First, \emph{the incidence rate (IR)} and \emph{the incidence rate ratio
+(IRR)} of emotional disorders for the entire population is estimated:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} PERSON{-}TIME PER EXPOSURE GROUP {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- PERSON-TIME PER EXPOSURE GROUP ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{py }\OtherTok{\textless{}{-}} \FunctionTok{pyears}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(child\_age, status }\SpecialCharTok{==} \StringTok{"emotional disorder"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ exposure,}
+             \AttributeTok{scale =} \DecValTok{10000}\NormalTok{,}
+             \AttributeTok{data.frame =} \ConstantTok{TRUE}\NormalTok{,}
+             \AttributeTok{data =}\NormalTok{ dat\_del2)}
+\NormalTok{py}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{as\_tibble}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{print}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 4
+##   exposure  pyears      n event
+##   <fct>      <dbl>  <dbl> <dbl>
+## 1 Unexposed   284. 273647  2518
+## 2 Exposed     167. 169170  1452
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} OVERALL INCIDENCE RATE (IR) {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- OVERALL INCIDENCE RATE (IR) ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{poiss }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(event }\SpecialCharTok{\textasciitilde{}} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(pyears)),}
+             \AttributeTok{family =}\NormalTok{ poisson,}
+             \AttributeTok{data =}\NormalTok{ py}\SpecialCharTok{$}\NormalTok{data)}
+\FunctionTok{parameters}\NormalTok{(poiss, }\AttributeTok{exponentiate =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits =} \DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parameter   |     IRR |      SE |             95% CI |         z |      p
+## -------------------------------------------------------------------------
+## (Intercept) | 8.81893 | 0.13997 | [8.54883, 9.09757] | 137.16201 | < .001
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} INCIDENCE RATE RATIO (IRR) {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- INCIDENCE RATE RATIO (IRR) ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{poiss\_exposure }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(event }\SpecialCharTok{\textasciitilde{}} \FunctionTok{offset}\NormalTok{(}\FunctionTok{log}\NormalTok{(pyears)) }\SpecialCharTok{+}\NormalTok{ exposure,}
+                    \AttributeTok{family =}\NormalTok{ poisson,}
+                    \AttributeTok{data =}\NormalTok{ py}\SpecialCharTok{$}\NormalTok{data)}
+\FunctionTok{parameters}\NormalTok{(poiss\_exposure, }\AttributeTok{exponentiate =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits =} \DecValTok{5}\NormalTok{, }
+           \AttributeTok{include\_reference =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parameter            |     IRR |      SE |             95% CI |         z |      p
+## ----------------------------------------------------------------------------------
+## (Intercept)          | 8.87682 | 0.17690 | [8.53460, 9.22806] | 109.56448 | < .001
+## exposure [Unexposed] | 1.00000 |         |                    |           |       
+## exposure [Exposed]   | 0.98237 | 0.03237 | [0.92075, 1.04772] |  -0.53983 | 0.589
+\end{verbatim}
+
+A regression analysis (\emph{Poisson test}) without explanatory
+variables (an intercept-only model) is calculated to check if the
+overall incidence rate is calculated correct:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} POISSON TEST {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- POISSON TEST ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{poisson.test}\NormalTok{(}\FunctionTok{sum}\NormalTok{(py}\SpecialCharTok{$}\NormalTok{data}\SpecialCharTok{$}\NormalTok{event), }\AttributeTok{T =} \FunctionTok{sum}\NormalTok{(py}\SpecialCharTok{$}\NormalTok{data}\SpecialCharTok{$}\NormalTok{pyears))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Exact Poisson test
+## 
+## data:  sum(py$data$event) time base: sum(py$data$pyears)
+## number of events = 3970, time base = 450.17, p-value < 2.2e-16
+## alternative hypothesis: true event rate is not equal to 1
+## 95 percent confidence interval:
+##  8.546712 9.097610
+## sample estimates:
+## event rate 
+##   8.818929
+\end{verbatim}
+
+\textbf{Intercept} \emph{The overall incidence rate (IR)} of emotional
+disorders for the entire population is estimated to be 8,82 cases per
+10,000 person-years (95\% CI: 8.55, 9.10) while \emph{the incidence rate
+ratio (IRR)}, from the second model, shows that the baseline incidence
+rate among unexposed children is 8.88 cases per 10,000 person-years
+(95\% CI: 8.54, 9.23).
+
+\textbf{Comparing the two groups} Children exposed to synthetic oxytocin
+during labor have an \emph{Incidence Rate Ratio (IRR)} of 0.98 (95\% CI:
+0.92, 1.05). This indicates a non-statistically significant 2\% lower
+rate of developing emotional disorders during the follow-up period
+compared to unexposed children (p \textgreater{} 0,05).
+
+\section{QUESTION 2}\label{question-2}
+
+\subsection{a. We wish to compare the hazard (instantaneous risk) of
+emotional disorders between the two exposure groups, still using the
+child's age as the time scale. Formulate a regression model for this
+purpose and interpret the
+results.}\label{a.-we-wish-to-compare-the-hazard-instantaneous-risk-of-emotional-disorders-between-the-two-exposure-groups-still-using-the-childs-age-as-the-time-scale.-formulate-a-regression-model-for-this-purpose-and-interpret-the-results.}
+
+To compare the hazard, a Cox regression is applied to estimate the
+effect independently of the time perspective.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cox }\OtherTok{\textless{}{-}} \FunctionTok{coxph}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(child\_age, status }\SpecialCharTok{==} \StringTok{"emotional disorder"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ exposure, }
+             \AttributeTok{data =}\NormalTok{ dat\_del2)}
+\FunctionTok{parameters}\NormalTok{(cox, }\AttributeTok{exponentiate =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parameter          | Coefficient |   SE |       95% CI |    z |      p
+## ----------------------------------------------------------------------
+## exposure [Exposed] |        1.13 | 0.04 | [1.06, 1.20] | 3.60 | < .001
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nobs}\NormalTok{(cox)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3970
+\end{verbatim}
+
+\emph{The hazard ratio (HR)} for emotional disorders for an exposed
+child compared to an unexposed child is estimated to be 1.13 (95\% CI:
+1.06, 1.20), ergo 13\% increased hazard/instantaneous risk, at any given
+time point during the study. The HR assesses whether the effect remains
+constant regardless of when the two groups are compared.
+
+\subsection{b. In the model from Question 4.a, there is an assumption of
+proportional hazards. Describe this assumption and investigate its
+validity.}\label{b.-in-the-model-from-question-4.a-there-is-an-assumption-of-proportional-hazards.-describe-this-assumption-and-investigate-its-validity.}
+
+Cox regression is based on the same assumptions as Poisson regression,
+though now on the log-hazard scale. The assumption in 2.b regarding
+proportional hazards means that the effect of an explanatory variable
+remains constant over time on the chosen time scale. The model is built
+upon a single explanatory variable, exposure status, which is a
+categorical variable; therefore, no further categorization is required
+before constructing the log-log plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(broom)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# Calculating the survfit object}
+\NormalTok{sfit\_cloglog }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(child\_age, status }\SpecialCharTok{==} \StringTok{"emotional disorder"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ exposure,}
+                        \AttributeTok{data =}\NormalTok{ dat\_del2)}
+
+\CommentTok{\# Recoding the object to a dataframe + making a cloglog{-}transformation }
+\NormalTok{sfit\_cloglog\_df }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(sfit\_cloglog) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{cloglog\_val =} \FunctionTok{log}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{log}\NormalTok{(estimate)),}
+    \AttributeTok{exposure\_grp =} \FunctionTok{if\_else}\NormalTok{(strata }\SpecialCharTok{==} \StringTok{"exposure=Unexposed"}\NormalTok{, }\StringTok{"Unexposed"}\NormalTok{, }\StringTok{"Exposed"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{\textgreater{}} \DecValTok{3} \SpecialCharTok{\&}\NormalTok{ time }\SpecialCharTok{\textless{}=} \DecValTok{12}\NormalTok{)  }
+
+\CommentTok{\# Making the plot }
+\FunctionTok{ggplot}\NormalTok{(sfit\_cloglog\_df, }
+       \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ cloglog\_val, }\AttributeTok{color =}\NormalTok{ exposure\_grp)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_step}\NormalTok{(}\AttributeTok{linewidth =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}                           \CommentTok{\# Stepwise log{-}log lines}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"\#d96b52"}\NormalTok{, }\StringTok{"\#3a86d4"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Children\textquotesingle{}s age (years)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"log({-}log(Survival))"}\NormalTok{,}
+    \AttributeTok{title =} \StringTok{"Figure 5: Log{-}log plot for testing proportional hazards"}\NormalTok{,}
+    \AttributeTok{color =} \StringTok{"Exposure status"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{12}\NormalTok{, }\AttributeTok{margin =} \FunctionTok{margin}\NormalTok{(}\AttributeTok{b =} \DecValTok{10}\NormalTok{)),}
+    \AttributeTok{legend.position =} \StringTok{"right"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{DEL_B_files/figure-latex/unnamed-chunk-10-1.pdf}}
+
+In addition, a Schoenfeld residual plot is constructed to help with the
+investigating of the validity:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\CommentTok{\# 1. Beregn residualerne via overlevelsesanalysen}
+\NormalTok{test\_ph }\OtherTok{\textless{}{-}} \FunctionTok{cox.zph}\NormalTok{(cox)}
+
+\CommentTok{\# 2. Træk de KORREKTE transformerede data ud af objektet}
+\NormalTok{zph\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{time =}\NormalTok{ test\_ph}\SpecialCharTok{$}\NormalTok{x,          }\CommentTok{\# test\_ph$x indeholder den transformerede tid, som standard{-}plottet bruger!}
+  \AttributeTok{residuals =}\NormalTok{ test\_ph}\SpecialCharTok{$}\NormalTok{y[, }\DecValTok{1}\NormalTok{] }\CommentTok{\# Residualerne for første variabel}
+\NormalTok{)}
+
+\CommentTok{\# 3. Lav dit skræddersyede ggplot, som nu matcher perfekt}
+\FunctionTok{ggplot}\NormalTok{(zph\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ time, }\AttributeTok{y =}\NormalTok{ residuals)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{colour =} \StringTok{"\#3a86d4"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{color =} \StringTok{"\#d96b52"}\NormalTok{, }\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{TRUE}\NormalTok{, }
+              \AttributeTok{fill =} \StringTok{"\#d96b52"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{, }\AttributeTok{linewidth =} \FloatTok{0.8}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"grey40"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Figur 6: Schoenfeld residualplot for eksponeringsstatus"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Transformeret tid (KM)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Skalerede Schoenfeld residualer"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{11}\NormalTok{, }\AttributeTok{margin =} \FunctionTok{margin}\NormalTok{(}\AttributeTok{b =} \DecValTok{10}\NormalTok{))}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{DEL_B_files/figure-latex/unnamed-chunk-11-1.pdf}}
+The assumption is assessed based on the vertical distance between the
+curves. Ideally, the curves should run parallel to one another to
+conclude that no effect modification is present. In this case, the two
+curves follow each other with a consistently stable distance. A
+crossover is observed around 6 years of age; however, this is not a
+cause for concern, as it may be attributed to a small number of events.
+Therefore, the hypothesis of no effect modification between exposure
+status and the development of emotional disorders is
+accepted.Furthermore, this is supplemented by a Schoenfeld residual
+plot, where the trend line is assumed to be flat.
+
+\subsection{c.~To investigate whether a prior maternal psychiatric
+diagnosis modifies the effect of the exposure, while additionally
+adjusting for maternal smoking status (recoded into three categories),
+maternal age, and year of birth. Formulate a regression model and
+interpret the results with respect to this question. Since there are few
+events in the years 2010--2012, you must combine this group with the
+preceding one, so that the years 2008--2012 are considered a single
+group. Furthermore, the response must include an estimate of the effect
+of exposure for each of the two psychiatric diagnosis
+groups.}\label{c.-to-investigate-whether-a-prior-maternal-psychiatric-diagnosis-modifies-the-effect-of-the-exposure-while-additionally-adjusting-for-maternal-smoking-status-recoded-into-three-categories-maternal-age-and-year-of-birth.-formulate-a-regression-model-and-interpret-the-results-with-respect-to-this-question.-since-there-are-few-events-in-the-years-20102012-you-must-combine-this-group-with-the-preceding-one-so-that-the-years-20082012-are-considered-a-single-group.-furthermore-the-response-must-include-an-estimate-of-the-effect-of-exposure-for-each-of-the-two-psychiatric-diagnosis-groups.}
+
+To answer the question, the preceding Cox regression is applied,
+adjusting for \emph{maternal smoking status}, \emph{maternal age}, and
+\emph{the child's year of birth}, as well as an \emph{interaction
+between a prior maternal psychiatric diagnosis and exposure status}.
+Since there are few events in the years 2010--2012, this group is
+combined with the preceding one, such that the years 2008--2012 are
+considered a single group. We have noted missing values for maternal
+smoking status, and these are removed for this analysis.
+
+\subsubsection{Recoding the periods}\label{recoding-the-periods}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat\_del2 }\OtherTok{\textless{}{-}}\NormalTok{ dat\_del2 }\SpecialCharTok{|\textgreater{}} \FunctionTok{mutate}\NormalTok{(dat\_del2,}
+                               \AttributeTok{year\_grp =} \FunctionTok{fct\_collapse}\NormalTok{(year, }\StringTok{"2008{-}2012"} \OtherTok{=} \FunctionTok{c}\NormalTok{(}\StringTok{"2008{-}2009"}\NormalTok{, }\StringTok{"2010{-}2012"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Cox-regression}\label{cox-regression}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cox\_Int }\OtherTok{\textless{}{-}} \FunctionTok{coxph}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(child\_age, }
+\NormalTok{                      status }\SpecialCharTok{==} \StringTok{"emotional disorder"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ exposure }\SpecialCharTok{*}\NormalTok{ mat\_psych }\SpecialCharTok{+}\NormalTok{ mat\_smoked\_grp }\SpecialCharTok{+}\NormalTok{ mat\_age }\SpecialCharTok{+}\NormalTok{ year\_grp,}
+                 \AttributeTok{na.action =} \StringTok{"na.exclude"}\NormalTok{,}
+                 \AttributeTok{data =}\NormalTok{ dat\_del2)}
+\FunctionTok{parameters}\NormalTok{(cox\_Int, }\AttributeTok{exponentiate =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{include\_reference =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parameter                                           | Coefficient |    SE
+## -------------------------------------------------------------------------
+## exposure [Unexposed]                                |       1.000 |      
+## exposure [Exposed]                                  |       0.761 | 0.046
+## mat psych [Previously diagnosed]                    |       1.000 |      
+## mat psych [No prior diagnosis]                      |       0.157 | 0.008
+## mat smoked grp [Non-smoker]                         |       1.000 |      
+## mat smoked grp [Smoker]                             |       1.475 | 0.052
+## mat smoked grpEx smoker                             |       1.393 | 0.114
+## mat age                                             |       0.906 | 0.005
+## year grp [2000-2001]                                |       1.000 |      
+## year grp [2002-2003]                                |       0.330 | 0.014
+## year grp2004-2005                                   |       0.152 | 0.012
+## year grp2006-2007                                   |       0.080 | 0.013
+## year grp2008-2012                                   |       0.017 | 0.010
+## exposure [Exposed] × mat psych [No prior diagnosis] |       1.222 | 0.089
+## 
+## Parameter                                           |         95% CI |       z |      p
+## ---------------------------------------------------------------------------------------
+## exposure [Unexposed]                                |                |         |       
+## exposure [Exposed]                                  | [0.676, 0.858] |  -4.478 | < .001
+## mat psych [Previously diagnosed]                    |                |         |       
+## mat psych [No prior diagnosis]                      | [0.143, 0.173] | -38.622 | < .001
+## mat smoked grp [Non-smoker]                         |                |         |       
+## mat smoked grp [Smoker]                             | [1.376, 1.581] |  10.978 | < .001
+## mat smoked grpEx smoker                             | [1.187, 1.635] |   4.056 | < .001
+## mat age                                             | [0.895, 0.917] | -16.442 | < .001
+## year grp [2000-2001]                                |                |         |       
+## year grp [2002-2003]                                | [0.304, 0.358] | -26.617 | < .001
+## year grp2004-2005                                   | [0.130, 0.177] | -23.465 | < .001
+## year grp2006-2007                                   | [0.058, 0.110] | -15.638 | < .001
+## year grp2008-2012                                   | [0.006, 0.055] |  -6.958 | < .001
+## exposure [Exposed] × mat psych [No prior diagnosis] | [1.060, 1.410] |   2.760 | 0.006
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nobs}\NormalTok{(cox\_Int)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3831
+\end{verbatim}
+
+\textbf{Exposure Status {[}Exposed{]}} \emph{The Hazard Ratio (HR)} for
+emotional disorders for an exposed child compared to an unexposed child
+is estimated to be 0.761 (95\% CI: 0.676; 0.858), which is statistically
+significant (p \textless{} 0.001). This applies when comparing children
+who share the same birth year group, whose mødre are of the same age and
+smoking status, and where both mødre are previously diagnosed with a
+psychiatric condition. This indicates that at any given time point
+during the study, exposed children have a 23.9\% lower hazard
+(instantaneous risk) of developing an emotional disorder compared to
+unexposed children within this specific psychiatric subgroup.
+
+\textbf{Maternal Psychiatric History {[}No prior diagnosis{]}} Holding
+exposure status, birth year group, maternal age, and smoking status
+constant, the HR for emotional disorders for a child whose mother has no
+prior diagnosis compared to a child whose mother is previously diagnosed
+is estimated to be 0.157 (95\% CI: 0.143; 0.173), which is statistically
+significant (p \textless{} 0.001). Consequently, assuming both children
+are unexposed, \emph{the hazard} at any given time point in the study is
+84.3\% lower for children whose mødre have no prior psychiatric history.
+
+\textbf{Maternal Smoking Status {[}Smoker{]}} The HR for emotional
+disorders for a child whose mother is a smoker compared to a child whose
+mother is a non-smoker is estimated to be 1.475 (95\% CI: 1.376; 1.581),
+which is statistically significant (p \textless{} 0.001). This means
+that when comparing two children with identical exposure status, birth
+year group, maternal psychiatric history, and maternal age, the hazard
+at any given time point in the study is 47.5\% higher for the child with
+a smoking mother.
+
+\textbf{Maternal Smoking Status {[}Ex-smoker{]}} Comparing a child whose
+mother is an ex-smoker to a child whose mother is a non-smoker, the HR
+for emotional disorders is estimated to be 1.393 (95\% CI: 1.187;
+1.635), which is statistically significant (p \textless{} 0.001). Under
+identical background characteristics for exposure, birth year, maternal
+psychiatric history, and age, the hazard at any given time point in the
+study is 39.3\% higher for the child of an ex-smoker.
+
+\textbf{Maternal Age} For each additional year of maternal age, the
+hazard of the child developing an emotional disorder decreases by 9.4\%,
+holding all other variables constant. This is reflected by an estimated
+HR of 0.906 (95\% CI: 0.895; 0.917), which is statistically significant
+(p \textless{} 0.001).
+
+\textbf{Birth Year Group {[}2002--2003{]}} The HR for emotional
+disorders for a child born in 2002--2003 compared to a child born in the
+reference period 2000--2001 is estimated to be 0.330 (95\% CI: 0.304;
+0.358), which is statistically significant (p \textless{} 0.001). Given
+identical background characteristics, the hazard at any given time point
+in the study is 67.0\% lower for the child born in 2002--2003.(The
+remaining birth year groups are interpreted correspondingly,
+demonstrating a progressive decline in the hazard for later birth
+cohorts due to the shorter follow-up period; specifically, an 84.8\%
+reduction for 2004--2005 with an HR of 0.152, a 92.0\% reduction for
+2006--2007 with an HR of 0.080, and a 98.3\% reduction for 2008--2012
+with an HR of 0.017).
+
+\textbf{Exposure {[}Exposed{]} × Maternal Psychiatric History {[}No
+prior diagnosis{]}} The interaction term is estimated to be 1.222 (95\%
+CI: 1.060; 1.410), which is statistically significant (p = 0.006). This
+term represents the additional multiplicative factor that must be
+applied to the exposure effect when moving from the reference group
+(mothers with a prior diagnosis) to mothers with no prior psychiatric
+diagnosis. This indicates that the relative impact of oxytocin exposure
+on the child's hazard of emotional disorders is significantly modified
+by maternal psychiatric history, making the hazard ratio for exposure
+22.2\% higher among children whose mødre have no prior psychiatric
+diagnosis compared to those whose mødre are previously diagnosed.
+
+\subsubsection{The effect of exposure for each of the two psychiatric
+diagnosis
+groups.}\label{the-effect-of-exposure-for-each-of-the-two-psychiatric-diagnosis-groups.}
+
+To assess whether the effect of oxytocin exposure on the child's risk of
+developing an emotional disorder is modified by maternal psychiatric
+history, separate Hazard Ratios (HR) were estimated for each group:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Previously diagnosed}
+\NormalTok{hyp0 }\OtherTok{\textless{}{-}} \FunctionTok{hypotheses}\NormalTok{(cox\_Int,}
+                   \AttributeTok{hypothesis =} \StringTok{"exposureExposed = 0"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: The default delta method standard errors for `coxph` models only take
+## into account uncertainty in the regression coefficients. Standard errors may be
+## too small. Use the `inferences()` function or set `vcov` to "rsample", "boot"
+## or "fwb" to compute confidence intervals by bootstrapping. Set `vcov` to
+## `FALSE` or `options(marginaleffects_safe=FALSE)` to silence this warning.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# No prior diagnosis}
+\NormalTok{hyp1 }\OtherTok{\textless{}{-}} \FunctionTok{hypotheses}\NormalTok{(cox\_Int,}
+                   \AttributeTok{hypothesis =}  \StringTok{"exposureExposed + \textasciigrave{}exposureExposed:mat\_psychNo prior diagnosis\textasciigrave{} = 0"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: The default delta method standard errors for `coxph` models only take
+## into account uncertainty in the regression coefficients. Standard errors may be
+## too small. Use the `inferences()` function or set `vcov` to "rsample", "boot"
+## or "fwb" to compute confidence intervals by bootstrapping. Set `vcov` to
+## `FALSE` or `options(marginaleffects_safe=FALSE)` to silence this warning.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Collection all above}
+\NormalTok{samlet\_resultat }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(hyp0, hyp1)}
+\NormalTok{samlet\_visning }\OtherTok{\textless{}{-}}\NormalTok{ samlet\_resultat }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{parameters}\NormalTok{(}\AttributeTok{exponentiate =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{digits =} \DecValTok{5}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+  
+  \FunctionTok{select}\NormalTok{(Parameter, Coefficient, SE, p, CI\_low, CI\_high) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Parameter =} \FunctionTok{case\_match}\NormalTok{(}
+\NormalTok{    Parameter,}
+    \StringTok{"exposureExposed=0"} \SpecialCharTok{\textasciitilde{}} \StringTok{"Previously diagnosed"}\NormalTok{,}
+    \StringTok{"exposureExposed+\textasciigrave{}exposureExposed:mat\_psychNopriordiagnosis\textasciigrave{}=0"} \SpecialCharTok{\textasciitilde{}} \StringTok{"No prior diagnosis"}\NormalTok{,}
+    \AttributeTok{.default =}\NormalTok{ Parameter}
+\NormalTok{  ))}
+
+\FunctionTok{print}\NormalTok{(samlet\_visning, }\AttributeTok{digits =} \DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # Fixed Effects
+## 
+## Parameter            | Coefficient |     SE |      p |               CI
+## -----------------------------------------------------------------------
+## Previously diagnosed |      0.7614 | 0.0463 | < .001 | [0.6758, 0.8579]
+## No prior diagnosis   |      0.9307 | 0.0386 | 0.083  | [0.8580, 1.0095]
+\end{verbatim}
+
+\textbf{Maternal Psychiatric History {[}Previously diagnosed{]}} Among
+children whose mødre have a prior psychiatric diagnosis, exposure to
+synthetic oxytocin during labor is associated with a statistically
+significant decrease in the hazard of developing an emotional disorder
+(HR = 0.7614; 95\% CI: 0.6758; 0.8579; p \textless{} 0.001). Holding all
+other covariates constant, exposed children in this subgroup have a
+23.9\% lower hazard (instantaneous risk) compared to unexposed children.
+
+\textbf{Maternal Psychiatric History {[}No prior diagnosis{]}} In
+contrast, among children whose mødre have no prior psychiatric
+diagnosis, the effect of oxytocin exposure is not statistically
+significant (HR = 0.9307; 95\% CI: 0.8580; 1.0095; p = 0.083). Although
+the point estimate suggests a 6.9\% lower hazard for the exposed group,
+the 95\% confidence interval includes 1.00, meaning we cannot rule out
+the possibility of no effect.
+
+\textbf{Conclusion} Because \emph{the hazard ratios} differ
+substantially between the two strata, and since the underlying
+interaction term was statistically significant (p = 0.006), the
+conclusion is that maternal psychiatric history acts as a
+\emph{significant effect modifier}. The protective or downward shift in
+hazard associated with oxytocin exposure is exclusively observed and
+statistically reliable among children born to mødre with a pre-existing
+psychiatric history.
+
+\section{QUESTION 3}\label{question-3}
+
+Hereby foreward, instead of using the \emph{eksamen-statistik-1.csv},
+\emph{eksamen-statistik-2.csv} is going to be used
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Cleaning the environment }
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list =} \FunctionTok{ls}\NormalTok{())}
+
+\CommentTok{\# Read the new dataset }
+\NormalTok{del2 }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"eksamen{-}statistik{-}2.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 139 Columns: 3
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## dbl (3): id, oxy_A, oxy_B
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\subsection{a. Assess the agreement between the two measurement methods,
+A and
+B.}\label{a.-assess-the-agreement-between-the-two-measurement-methods-a-and-b.}
+
+Agreement between two measurement methods corresponds to a paired
+design, in accordance with Situation 3, where each individual
+contributes two observations. In this case, the measurements are taken
+under identical conditions using two different measurement methods.
+\emph{A scatter plot} is constructed to visualize the agreement.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ oxy\_B, }\AttributeTok{y =}\NormalTok{ oxy\_A), }\AttributeTok{data =}\NormalTok{ del2) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{slope =} \DecValTok{1}\NormalTok{, }\AttributeTok{intercept =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Metode A"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Metode B"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Figur 7: Scatter plot"}\NormalTok{,}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{11}\NormalTok{, }\AttributeTok{margin =} \FunctionTok{margin}\NormalTok{(}\AttributeTok{b =} \DecValTok{10}\NormalTok{))}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{DEL_B_files/figure-latex/unnamed-chunk-16-1.pdf}}
+
+There is no systematic difference between the two measurements is
+observed in \emph{the scatter plot}, as the data points do not lie
+systematically above or below the identity line; thus, the variation
+around the line reflects the random variation between the measurement
+methods.
+
+Additionally, the mean difference, standard deviation, and correlation
+are estimated.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Differens + mean}
+\NormalTok{del2 }\OtherTok{\textless{}{-}}\NormalTok{ del2 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{dif =}\NormalTok{ oxy\_B }\SpecialCharTok{{-}}\NormalTok{ oxy\_A,}
+         \AttributeTok{avg =}\NormalTok{ (oxy\_A }\SpecialCharTok{+}\NormalTok{ oxy\_B)}\SpecialCharTok{/}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\# Paired t{-}test with the estimate systematic differens}
+\FunctionTok{t.test}\NormalTok{(dif }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ del2) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{parameters}\NormalTok{(}\AttributeTok{digits =}  \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## One Sample t-test
+## 
+## Parameter |  Mean | mu | Difference |          95% CI | t(138) |     p
+## ----------------------------------------------------------------------
+## dif       | 0.029 |  0 |      0.029 | [-0.109, 0.168] |  0.419 | 0.676
+## 
+## Alternative hypothesis: true mean is not equal to 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Varians of difference and limits of agreement}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} VARIANS OF DIFFERENCE {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- VARIANS OF DIFFERENCE ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{var.test}\NormalTok{(dif }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ del2) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Estimate =} \FunctionTok{sqrt}\NormalTok{(Estimate),}
+         \AttributeTok{CI\_low =} \FunctionTok{sqrt}\NormalTok{(CI\_low),}
+         \AttributeTok{CI\_high =} \FunctionTok{sqrt}\NormalTok{(CI\_high),}
+         \AttributeTok{.keep =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{digits =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 3
+##   Estimate CI_low CI_high
+##      <dbl>  <dbl>   <dbl>
+## 1    0.826  0.739   0.936
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Limits of agreement }
+\NormalTok{mean\_est }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(del2}\SpecialCharTok{$}\NormalTok{dif)}
+\NormalTok{sd\_est }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(del2}\SpecialCharTok{$}\NormalTok{dif)}
+\NormalTok{pi\_low }\OtherTok{\textless{}{-}}\NormalTok{ mean\_est }\SpecialCharTok{{-}} \FloatTok{1.96}\SpecialCharTok{*}\NormalTok{sd\_est}
+\NormalTok{pi\_high }\OtherTok{\textless{}{-}}\NormalTok{ mean\_est }\SpecialCharTok{+} \FloatTok{1.96}\SpecialCharTok{*}\NormalTok{sd\_est}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} LIMITS OF AGREEMENT {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- LIMITS OF AGREEMENT ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{PI\_low =}\NormalTok{ pi\_low, }\AttributeTok{PI\_high =}\NormalTok{ pi\_high) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{print}\NormalTok{(}\AttributeTok{digits =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   PI_low PI_high
+## 1  -1.59    1.65
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Correlation between measurements}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{{-}{-}{-} CORRELATION{-}TEST {-}{-}{-}}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## --- CORRELATION-TEST ---
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cor.test}\NormalTok{( }\SpecialCharTok{\textasciitilde{}}\NormalTok{ oxy\_A }\SpecialCharTok{+}\NormalTok{ oxy\_B, }\AttributeTok{data =}\NormalTok{ del2, }\AttributeTok{method =} \StringTok{"spearman"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{parameters}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in cor.test.default(x = mf[[1L]], y = mf[[2L]], ...): Cannot compute
+## exact p-value with ties
+\end{verbatim}
+
+\begin{verbatim}
+## Spearman's rank correlation rho
+## 
+## Parameter1 | Parameter2 |  rho |        S |      p
+## --------------------------------------------------
+## oxy_A      |      oxy_B | 0.90 | 46298.20 | < .001
+## 
+## Alternative hypothesis: true rho is not equal to 0
+\end{verbatim}
+
+The mean difference reflects the systematic difference in averages
+between the two measurements and is estimated to be 0.03 (95\% CI:
+-0.11; 0.17), which is considered a small difference. Furthermore, this
+difference is not statistically significant (p = 0.68), which is also
+apparent since 0 is included within the confidence interval.The random
+variation is assessed by an estimated standard deviation of the
+differences of 0.83 (95\% CI: 0.74; 0.94). A 95\% prediction interval
+for the differences, the Limits of Agreement, is estimated to be (-1.60;
+1.70); therefore, the difference between the two measurements will, with
+high probability, not exceed 1.70. This interval provides information
+about the precision of the measurement method and should be evaluated
+based on clinical knowledge.This is supplemented by a correlation test,
+which measures the strength of a potential dependence between the two
+measurement methods. The Spearman correlation is applied because it
+measures a monotonic relationship.Correlation coefficients range from
+(-1; 1), where 1 signifies a perfect positive monotonic relationship. In
+this case, a correlation of 0.90 is obtained, from which a high degree
+of agreement between the two measurement methods is concluded. However,
+a strong correlation does not always imply good agreement.
+
+The aforementioned estimates are visualized using a Bland-Altman plot:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ttest }\OtherTok{\textless{}{-}} \FunctionTok{t.test}\NormalTok{(dif }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ del2) }\SpecialCharTok{|\textgreater{}} \FunctionTok{parameters}\NormalTok{()}
+\NormalTok{mean\_est }\OtherTok{\textless{}{-}}\NormalTok{ ttest}\SpecialCharTok{$}\NormalTok{Mean}
+\NormalTok{ci\_low }\OtherTok{\textless{}{-}}\NormalTok{ ttest}\SpecialCharTok{$}\NormalTok{CI\_low}
+\NormalTok{ci\_high }\OtherTok{\textless{}{-}}\NormalTok{ ttest}\SpecialCharTok{$}\NormalTok{CI\_high}
+\NormalTok{sd\_est }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(del2}\SpecialCharTok{$}\NormalTok{dif)}
+\NormalTok{pi\_low }\OtherTok{\textless{}{-}}\NormalTok{ mean\_est }\SpecialCharTok{{-}} \FloatTok{1.96}\SpecialCharTok{*}\NormalTok{sd\_est}
+\NormalTok{pi\_high }\OtherTok{\textless{}{-}}\NormalTok{ mean\_est }\SpecialCharTok{+} \FloatTok{1.96}\SpecialCharTok{*}\NormalTok{sd\_est}
+
+\FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ avg, }\AttributeTok{y =}\NormalTok{ dif), }\AttributeTok{data =}\NormalTok{ del2) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =}\NormalTok{ mean\_est, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =}\NormalTok{ ci\_low, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =}\NormalTok{ ci\_high, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =}\NormalTok{ pi\_low, }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =}\NormalTok{ pi\_high, }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Mean"}\NormalTok{, }
+       \AttributeTok{y =} \StringTok{"Difference"}\NormalTok{,}
+       \AttributeTok{title =} \StringTok{"Figure 8: Bland{-}Altman plot"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{11}\NormalTok{, }\AttributeTok{margin =} \FunctionTok{margin}\NormalTok{(}\AttributeTok{b =} \DecValTok{10}\NormalTok{))}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{DEL_B_files/figure-latex/unnamed-chunk-18-1.pdf}}
+The Bland-Altman plot shows that the zero line (the black line) is
+contained within the limits of agreement (the red dashed lines). Because
+the zero line falls within these bounds, it is plausible that the true
+mean difference could be equal to zero, indicating no systematic
+difference between the two measurement methods. However, values that
+fell below the detection limit of the measuring instruments were
+included in the analysis, which could potentially impact the results of
+the study.
+
+\section{QUESTION 4}\label{question-4}
+
+A group of researchers wishes to evaluate a new intervention designed to
+increase natural oxytocin levels in women during labor. They plan a
+\emph{randomized controlled trial (RCT)} with a \emph{1:1 allocation
+ratio}, randomly assigning laboring women to either the new intervention
+or usual care. The research group expects the new intervention to lead
+to an \emph{increase in mean oxytocin of 2 pg/ml}. The group considers
+an increase in the mean of \emph{1 pg/ml to be the minimum clinically
+relevant difference}. Thus, they wish to design the study to reject the
+hypothesis that the intervention effect on mean oxytocin is less than
+this minimum relevant threshold. The women's oxytocin levels will be
+measured using the approach referred to as Method A in previouse
+question. - \textbf{delta:} Difference in detection \emph{minimal
+clinically important difference (MCID)} delta = 1 (2 pg/ml - 1 pg/ml = 1
+pg/ml) - \textbf{sd:} Standard deviation from previous question
+sd(del2\$oxy\_A, na.rm = TRUE) - \textbf{power:} 90\% power = 0,90 -
+\textbf{sign.level:} 5\% significans level
+
+Since the research group knows you possess the data from previouse
+question, they ask you to provide an estimate for the relevant standard
+deviation of the oxytocin measurements, assuming that the standard
+deviation between women is identical across the two groups.
+
+\subsection{a. Calculate the required sample size for the researchers to
+reject their hypothesis with 90\% power and a 5\% (two-sided)
+significance
+level.}\label{a.-calculate-the-required-sample-size-for-the-researchers-to-reject-their-hypothesis-with-90-power-and-a-5-two-sided-significance-level.}
+
+Firstly, the number, SD, mean and the 95\%-CI is calculated:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{del2 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{n =} \FunctionTok{n}\NormalTok{(),}
+            \AttributeTok{sd =} \FunctionTok{sd}\NormalTok{(oxy\_A),}
+            \AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(oxy\_A),}
+            \AttributeTok{lwr =} \FunctionTok{mean}\NormalTok{(oxy\_A) }\SpecialCharTok{{-}} \FloatTok{1.96} \SpecialCharTok{*} \FunctionTok{sd}\NormalTok{(oxy\_A),}
+            \AttributeTok{upp =} \FunctionTok{mean}\NormalTok{(oxy\_A) }\SpecialCharTok{+} \FloatTok{1.96} \SpecialCharTok{*} \FunctionTok{sd}\NormalTok{(oxy\_A))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##       n    sd  mean    lwr   upp
+##   <int> <dbl> <dbl>  <dbl> <dbl>
+## 1   139  2.00  2.97 -0.940  6.89
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pwrss.t.2means}\NormalTok{(}
+  \AttributeTok{mu1 =} \DecValTok{2}\NormalTok{,           }\CommentTok{\# The group increase in the mean}
+  \AttributeTok{mu2 =} \DecValTok{0}\NormalTok{,           }
+  \AttributeTok{sd1 =} \FloatTok{1.996527}\NormalTok{,    }\CommentTok{\# The actually varians (SD) from above data}
+  \AttributeTok{sd2 =} \FloatTok{1.996527}\NormalTok{,    }
+  \AttributeTok{power =} \FloatTok{0.90}\NormalTok{,      }\CommentTok{\# 90\% styrke}
+  \AttributeTok{margin =} \DecValTok{1}\NormalTok{,        }\CommentTok{\# MCID}
+  \AttributeTok{alpha =} \FloatTok{0.05}\NormalTok{,      }\CommentTok{\# 5\% signifikansniveau}
+  \AttributeTok{alternative =} \StringTok{"superior"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## +--------------------------------------------------+
+## |             SAMPLE SIZE CALCULATION              |
+## +--------------------------------------------------+
+## 
+## Welch's T-Test (Independent Samples)
+## 
+## ---------------------------------------------------
+## Hypotheses
+## ---------------------------------------------------
+##   H0 (Null Claim) : d - null.d <= margin 
+##   H1 (Alt. Claim) : d - null.d > margin 
+## 
+## ---------------------------------------------------
+## Results
+## ---------------------------------------------------
+##   Sample Size            = 74 and 74  <<
+##   Type 1 Error (alpha)   = 0.050
+##   Type 2 Error (beta)    = 0.098
+##   Statistical Power      = 0.902
+\end{verbatim}
+
+Based on the plasma oxytocin measurements from Part C (Method A), the
+common standard deviation between women was estimated to be
+\(\sigma = 1.9965\). To design a study capable of rejecting the null
+hypothesis (that the intervention effect is less than the minimum
+clinically relevant difference of \(1\text{ pg/ml}\)) with \(90\%\)
+power and a \(5\%\) significance level, a power analysis for a
+two-sample superior t-test was conducted.Assuming an expected mean
+increase of \(2\text{ pg/ml}\) under the new intervention and a \(1:1\)
+allocation ratio, the researchers require a sample size of 91 women per
+group, yielding a total study population of 182 women.
+
+\subsection{b. Briefly discuss the researchers' choice of a clinically
+relevant effect threshold of 1 pg/ml, drawing upon your findings from
+previous
+question.}\label{b.-briefly-discuss-the-researchers-choice-of-a-clinically-relevant-effect-threshold-of-1-pgml-drawing-upon-your-findings-from-previous-question.}
+
+Drawing upon the descriptive findings from previous question, the
+researchers' choice of a \(1\text{ pg/ml}\) threshold warrants critical
+discussion: - \textbf{In relation to the sample mean:} In previous
+question, the baseline mean oxytocin concentration measured by Method A
+was only \(2.97\text{ pg/ml}\). An increase of \(1\text{ pg/ml}\)
+therefore represents a massive relative expansion of approximately
+\(34\%\) from the baseline average. Targeting such a substantial shift
+as the minimum important difference might be overly optimistic. -
+\textbf{In relation to the random variation:} The SD within the
+population (\(\sigma = 1.9965\)) is twice as large as the minimum
+relevant threshold (\(1\text{ pg/ml}\)). This indicates substantial
+natural variation between women. Because the signal (the threshold of
+\(1\text{ pg/ml}\)) is relatively weak compared to the noise (the
+standard deviation of \(\sim 2\text{ pg/ml}\)), detecting this specific
+boundary requires a larger sample size to ensure that natural
+fluctuations do not mask the true intervention effect.
+
+\end{document}
